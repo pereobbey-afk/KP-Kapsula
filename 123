@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Коммерческое предложение — Капсула</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 9pt;
+            line-height: 1.35;
+            color: #1a237e;
+            background: #ffffff;
+        }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 0 auto;
+            background: #ffffff;
+            page-break-after: always;
+            position: relative;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        .header {
+            background: #1a237e;
+            color: #ffffff;
+            padding: 20px;
+            margin: -15mm -15mm 15px -15mm;
+            text-align: center;
+        }
+        
+        .header .logo-text {
+            font-size: 26pt;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+        
+        .header h1 {
+            font-size: 14pt;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .header h2 {
+            font-size: 10pt;
+            font-weight: 400;
+            margin-top: 6px;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin-bottom: 12px;
+            border: 1.5px solid #1a237e;
+        }
+        
+        .section-title {
+            background: #1a237e;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 10pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section-content {
+            padding: 10px 12px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+            font-size: 8pt;
+        }
+        
+        table:last-child {
+            margin-bottom: 0;
+        }
+        
+        thead {
+            background: #1a237e;
+            color: #ffffff;
+        }
+        
+        th {
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #1a237e;
+            vertical-align: top;
+        }
+        
+        td {
+            padding: 5px 8px;
+            border: 1px solid #1a237e;
+            vertical-align: top;
+        }
+        
+        tr:nth-child(even) {
+            background: #e8eaf6;
+        }
+        
+        .total-row {
+            background: #1a237e !important;
+            color: #ffffff;
+            font-weight: 700;
+        }
+        
+        .subtotal-row {
+            background: #c5cae9;
+            font-weight: 600;
+        }
+        
+        .subsection {
+            font-size: 9pt;
+            font-weight: 700;
+            color: #1a237e;
+            margin: 10px 0 6px 0;
+            padding-bottom: 3px;
+            border-bottom: 2px solid #1a237e;
+        }
+        
+        .params-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .param-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: #e8eaf6;
+            border-left: 3px solid #1a237e;
+        }
+        
+        .param-label {
+            font-weight: 600;
+        }
+        
+        .highlight-box {
+            background: #1a237e;
+            color: #ffffff;
+            padding: 12px;
+            text-align: center;
+            margin: 12px 0;
+        }
+        
+        .highlight-box .big-number {
+            font-size: 32pt;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .highlight-box .label {
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0;
+        }
+        
+        .comparison-card {
+            border: 2px solid #1a237e;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .comparison-card .card-title {
+            background: #1a237e;
+            color: #ffffff;
+            margin: -12px -12px 12px -12px;
+            padding: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 9pt;
+        }
+        
+        .comparison-card .days {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #1a237e;
+        }
+        
+        .comparison-card .months {
+            font-size: 10pt;
+            color: #555555;
+            margin-top: 4px;
+        }
+        
+        .critical-path {
+            background: #ffebee;
+            border-left: 4px solid #c62828;
+            padding: 6px 10px;
+            margin: 6px 0;
+            font-size: 8pt;
+        }
+        
+        .dry-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ef6c00;
+            padding: 6px 10px;
+            margin: 6px 0;
+        }
+        
+        .dry-warning strong {
+            color: #e65100;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #1a237e;
+            text-align: center;
+            font-size: 8pt;
+            color: #1a237e;
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 10mm;
+            right: 15mm;
+            font-size: 8pt;
+            color: #1a237e;
+        }
+    </style>
+</head>
+<body>
+
+<!-- СТРАНИЦА 1: ТИТУЛЬНАЯ + ИСХОДНЫЕ ДАННЫЕ + КАПСУЛА -->
+<div class="page">
+    <div class="header">
+        <div class="logo-text">КАПСУЛА</div>
+        <h1>Коммерческое предложение</h1>
+        <h2>Сравнительный анализ технологии «Капсула» versus классический ремонт</h2>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Исходные данные объекта</div>
+        <div class="section-content">
+            <div class="params-grid">
+                <div class="param-item">
+                    <span class="param-label">Общая площадь:</span>
+                    <span>360 м²</span>
+                </div>
+                <div class="param-item">
+                    <span class="param-label">Количество квартир:</span>
+                    <span>8 штук</span>
+                </div>
+                <div class="param-item">
+                    <span class="param-label">Средняя площадь квартиры:</span>
+                    <span>45 м²</span>
+                </div>
+                <div class="param-item">
+                    <span class="param-label">Высота потолков:</span>
+                    <span>2,7 метра</span>
+                </div>
+                <div class="param-item">
+                    <span class="param-label">Бригада:</span>
+                    <span>6–8 человек</span>
+                </div>
+                <div class="param-item">
+                    <span class="param-label">Регион:</span>
+                    <span>Москва и Московская область</span>
+                </div>
+            </div>
+            <div class="param-item" style="margin-bottom:0;">
+                <span class="param-label">Основной критерий сроков:</span>
+                <span>Все комплектующие на объекте</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Технология «Капсула» — поэтапный расчёт сроков</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:5%;">№</th>
+                        <th style="width:32%;">Этап работ</th>
+                        <th style="width:18%;">Сроки</th>
+                        <th style="width:45%;">Особенности и примечания</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Сборка каркаса с шумоизоляцией</td>
+                        <td>7–10 дней</td>
+                        <td>Масштабируется по количеству людей. При увеличении бригады — ускорение сроков изготовления.</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Электрика плюс сантехника с установкой всех чистовых элементов</td>
+                        <td>4–6 дней</td>
+                        <td>Чистовая установка выполняется сразу, без отдельного захода бригады.</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Фальшпол</td>
+                        <td>2–4 дня</td>
+                        <td>Рабочие те же, что собирают каркас. Переквалификация не требуется.</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Укладка плитки плюс укладка чистового напольного покрытия плюс монтаж панелей</td>
+                        <td>7–10 дней</td>
+                        <td>Один большой этап, выполняется одновременно. Параллельная работа бригад.</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Натяжной потолок</td>
+                        <td>3–4 дня</td>
+                        <td>Выполняется после готовности стен и полов.</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Плинтуса, подоконники, двери, откосы и все доработки</td>
+                        <td>3–4 дня</td>
+                        <td>Финальные работы, закрытие дефектов, приёмка объекта.</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2">ИТОГО ПО ТЕХНОЛОГИИ «КАПСУЛА»</td>
+                        <td colspan="2">26–38 дней (0,9–1,3 месяца)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="highlight-box">
+        <span class="big-number">26–38</span>
+        <span class="label">дней на полный цикл отделки 8 квартир</span>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Преимущества технологии «Капсула»</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Отсутствие мокрых процессов</td>
+                        <td>Нет штукатурки, стяжки, покраски — нет сушки</td>
+                    </tr>
+                    <tr>
+                        <td>Параллельные этапы</td>
+                        <td>Плитка, напольное покрытие, панели — одновременно</td>
+                    </tr>
+                    <tr>
+                        <td>Единая бригада</td>
+                        <td>Каркасники делают фальшпол — без переквалификации</td>
+                    </tr>
+                    <tr>
+                        <td>Чистовая сантехника и электрика сразу</td>
+                        <td>Нет возврата бригад после отделки</td>
+                    </tr>
+                    <tr>
+                        <td>Суммарная сушка</td>
+                        <td><strong>0 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 2: КЛАССИКА — ЭТАП 1 -->
+<div class="page">
+    <div class="header" style="padding:15px;">
+        <h1 style="font-size:14pt;">Классический ремонт по нормативам</h1>
+        <h2 style="font-size:9pt;">ФЕР-2001, ТСН-2001, СНиП 3.04.01-87, СП 71.13330.2017, СП 55-101-2000, СП 30.13330.2020, СП 76.13330.2016</h2>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Этап 1. Демонтаж плюс подготовка оснований</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-01-001, СП 71.13330.2017 пункт 5.1.2</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,08 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>360 м² умножить на 0,08 равно <strong>28,8 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td>4,8 дня округляем до <strong>5 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td>3,6 дня округляем до <strong>4 дня</strong></td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Сроки этапа</td>
+                        <td><strong>4–5 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка</td>
+                        <td>Не требуется</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Этап 2. Шумоизоляция по периметру (стены плюс пол плюс потолок)</div>
+        <div class="section-content">
+            
+            <div class="subsection">2.1. Шумоизоляция пола</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Конструкция</td>
+                        <td>Плавающий пол: гидроизоляция, контр-обрешётка 50 на 50 миллиметров, минеральная вата 50–100 миллиметров, звукоизоляционная мембрана, двойная обрешётка, финишное основание</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 55-101-2000, ТСН 2001-58, ФЕР 46-02-005</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,15 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>360 умножить на 0,15 равно <strong>54 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>9 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>7 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>7–9 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка</td>
+                        <td>Не требуется (сухая сборка)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">2.2. Шумоизоляция потолка</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Конструкция</td>
+                        <td>Подвесной потолок на пружинных подвесах, минеральная вата 50 миллиметров, звукоизоляционная мембрана, гипсокартонный лист 2 слоя</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ТСН 2001-58, ФЕР 46-02-005</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,18 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>360 умножить на 0,18 равно <strong>64,8 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>11 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>9 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>9–11 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка</td>
+                        <td>Не требуется</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">2.3. Шумоизоляция стен</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Конструкция</td>
+                        <td>Каркас 50 на 50 миллиметров, минеральная вата 50 миллиметров, звукоизоляционная мембрана, гипсокартонный лист 2 слоя, герметизация швов</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ТСН 2001-58, ФЕР 46-02-003</td>
+                    </tr>
+                    <tr>
+                        <td>Площадь стен</td>
+                        <td>200 метров умножить на 2,7 метра равно <strong>540 м²</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,22 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>540 умножить на 0,22 равно <strong>118,8 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>20 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>15 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>15–20 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка</td>
+                        <td>Не требуется</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="critical-path">
+                <strong>Критическое ограничение:</strong> пол, потолок и стены выполняются последовательно, перекрытия нельзя делать одновременно по конструктивной необходимости.
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Итого этап 2</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="subtotal-row">
+                        <td>Последовательно: пол плюс потолок плюс стены</td>
+                        <td>7–9 плюс 9–11 плюс 15–20 равно <strong>31–40 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Общая трудоёмкость</td>
+                        <td>54 плюс 64,8 плюс 118,8 равно <strong>237,6 человеко-дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 3: КЛАССИКА — ЭТАП 3 -->
+<div class="page">
+    <div class="section">
+        <div class="section-title">Этап 3. Штукатурка стен и потолков</div>
+        <div class="section-content">
+            
+            <div class="subsection">3.1. Штукатурка стен цементно-песчаная 15 миллиметров</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-02-001, СНиП 3.04.01-87</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,25 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Площадь</td>
+                        <td>540 м²</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>540 умножить на 0,25 равно <strong>135 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>23 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>17 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>17–23 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">3.2. Штукатурка потолков 10 миллиметров</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-02-002</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,30 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Площадь</td>
+                        <td>360 м²</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>360 умножить на 0,30 равно <strong>108 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>18 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>14 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>14–18 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">3.3. СУШКА ШТУКАТУРКИ (ОБЯЗАТЕЛЬНА ПО НОРМАТИВАМ)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СНиП 3.04.01-87 пункт 5.5, СП 71.13330.2017 пункт 5.1.8</td>
+                    </tr>
+                    <tr>
+                        <td>Толщина слоя стен</td>
+                        <td>15 миллиметров</td>
+                    </tr>
+                    <tr>
+                        <td>Толщина слоя потолков</td>
+                        <td>10 миллиметров</td>
+                    </tr>
+                    <tr>
+                        <td>Норма сушки</td>
+                        <td>1 сутки на 1 миллиметр толщины при температуре 20 градусов Цельсия и влажности не более 60 процентов</td>
+                    </tr>
+                    <tr>
+                        <td>Сроки сушки стен</td>
+                        <td>15 умножить на 1 равно <strong>15 суток</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки сушки потолков</td>
+                        <td>10 умножить на 1 равно <strong>10 суток</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Параллельно стены и потолки</td>
+                        <td><strong>15 суток</strong> по максимуму</td>
+                    </tr>
+                    <tr>
+                        <td>Условия ускорения</td>
+                        <td>Принудительная вентиляция, обогрев — сокращение до 10–12 суток с риском трещин</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Стандартная сушка с учётом климатических факторов Москвы</td>
+                        <td><strong>14–21 день</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="dry-warning">
+                <strong>Важно:</strong> работы по следующему этапу без полной сушки приводят к отслаиванию, плесени, трещинам. Гарантия теряется.
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Итого этап 3</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Штукатурка стен</td>
+                        <td>17–23 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Штукатурка потолков (после стен)</td>
+                        <td>14–18 дней</td>
+                    </tr>
+                    <tr>
+                        <td>СУШКА</td>
+                        <td>14–21 день</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Общие сроки этапа</td>
+                        <td><strong>45–62 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Общая трудоёмкость</td>
+                        <td>135 плюс 108 равно <strong>243 человеко-дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 4: КЛАССИКА — ЭТАП 4 -->
+<div class="page">
+    <div class="section">
+        <div class="section-title">Этап 4. Шпатлёвка плюс покраска стен и потолков</div>
+        <div class="section-content">
+            
+            <div class="subsection">4.1. Грунтовка (2 слоя)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 71.13330.2017 пункт 5.2.3</td>
+                    </tr>
+                    <tr>
+                        <td>Площадь</td>
+                        <td>900 м² (стены 540 плюс потолки 360)</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,03 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>900 умножить на 0,03 равно <strong>27 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>5 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>4 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>4–5 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">4.2. Сушка грунтовки первого слоя</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 71.13330.2017 пункт 5.3.2</td>
+                    </tr>
+                    <tr>
+                        <td>Время высыхания</td>
+                        <td>2–4 часа при 20 градусах Цельсия</td>
+                    </tr>
+                    <tr>
+                        <td>Фактически с учётом условий</td>
+                        <td><strong>0,5 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">4.3. Шпатлёвка (2 слоя под покраску)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-03-001</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,12 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>900 умножить на 0,12 равно <strong>108 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>18 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>14 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>14–18 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">4.4. Сушка шпатлёвки межслойная</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 71.13330.2017 пункт 5.3.2</td>
+                    </tr>
+                    <tr>
+                        <td>Первый слой сушка</td>
+                        <td>3–6 часов округляем до <strong>1 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Второй слой сушка</td>
+                        <td>12–24 часа округляем до <strong>1–2 дня</strong></td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Межслойная сушка</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">4.5. Шлифовка</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,05 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>900 умножить на 0,05 равно <strong>45 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>8 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>6 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>6–8 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">4.6. Покраска (2 слоя водоэмульсионной краской)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-04-001</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,08 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>900 умножить на 0,08 равно <strong>72 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>12 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>9 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>9–12 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">4.7. Сушка краски межслойная и финальная</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 71.13330.2017 пункт 5.3.2</td>
+                    </tr>
+                    <tr>
+                        <td>Межслойная сушка между слоями</td>
+                        <td>4–6 часов округляем до <strong>1 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Финальная сушка полная полимеризация</td>
+                        <td>24 часа округляем до <strong>1–2 дня</strong></td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Сушка покраски</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Итого этап 4</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Грунтовка</td>
+                        <td>4–5 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Сушка грунтовки</td>
+                        <td>0,5 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Шпатлёвка</td>
+                        <td>14–18 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Межслойная сушка шпатлёвки</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Шлифовка</td>
+                        <td>6–8 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Покраска</td>
+                        <td>9–12 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Сушка покраски</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Общие сроки этапа</td>
+                        <td><strong>38–50 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Общая трудоёмкость</td>
+                        <td>27 плюс 108 плюс 45 плюс 72 равно <strong>252 человеко-дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 5: КЛАССИКА — ЭТАП 5 -->
+<div class="page">
+    <div class="section">
+        <div class="section-title">Этап 5. Электрика плюс сантехника</div>
+        <div class="section-content">
+            
+            <div class="subsection">5.1. Скрытая часть (выполняется до штукатурки)</div>
+            
+            <div class="subsection" style="font-size:8pt; margin-left:8px;">5.1.1. Штробление, короба, кабельные лотки</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 76.13330.2016 (штробление в монолите запрещено без согласования)</td>
+                    </tr>
+                    <tr>
+                        <td>Решение</td>
+                        <td>Открытая прокладка в коробах, кабель-каналах</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,10 человеко-дня на метр погонный</td>
+                    </tr>
+                    <tr>
+                        <td>Длина трасс условно</td>
+                        <td>примерно 800 метров</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>800 умножить на 0,10 равно <strong>80 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>14 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>10 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>10–14 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection" style="font-size:8pt; margin-left:8px;">5.1.2. Монтаж электротрасс, щитков, розеток (скрытая часть)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕРм 05-01-001</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,08 человеко-дня на точку</td>
+                    </tr>
+                    <tr>
+                        <td>Количество точек условно</td>
+                        <td>примерно 200 штук</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>200 умножить на 0,08 равно <strong>16 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection" style="font-size:8pt; margin-left:8px;">5.1.3. Опрессовка, проверка изоляции</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 31-110-2003</td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection" style="font-size:8pt; margin-left:8px;">5.1.4. Сантехника: разводка труб полипропилен или металлопласт</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 30.13330.2020, СП 55-101-2000</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,12 человеко-дня на метр погонный</td>
+                    </tr>
+                    <tr>
+                        <td>Длина трасс условно</td>
+                        <td>примерно 400 метров</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>400 умножить на 0,12 равно <strong>48 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>8 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>6 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>6–8 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection" style="font-size:8pt; margin-left:8px;">5.1.5. Опрессовка сантехники</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>1–2 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="critical-path">
+                <strong>Особенность:</strong> скрытая электрика и сантехника выполняются до штукатурки и покраски, но чистовая установка — после всей отделки. Это разносит этап на два захода с перерывом.
+            </div>
+            
+            <div class="subsection">5.2. Пауза (штукатурка, сушка, покраска — этапы 3 и 4)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="subtotal-row">
+                        <td>Простой бригады электриков и сантехников</td>
+                        <td><strong>45–62 дня</strong> (пока идут этапы 3 и 4)</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">5.3. Чистовая установка (после всей отделки)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Установка розеток и выключателей чистовых</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Установка светильников</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Установка смесителей, унитазов, раковин, ванн</td>
+                        <td>3–4 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Подключение стиральных и посудомоечных машин</td>
+                        <td>1–2 дня</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Сроки чистовой установки</td>
+                        <td><strong>8–12 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Итого этап 5</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Скрытая электрика</td>
+                        <td>10–14 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Скрытая сантехника</td>
+                        <td>6–8 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Параллельно разные бригады</td>
+                        <td><strong>12–16 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Опрессовки</td>
+                        <td>3–5 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Пауза штукатурка сушка покраска</td>
+                        <td>45–62 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Чистовая установка</td>
+                        <td>8–12 дней</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Общие сроки этапа с паузой</td>
+                        <td><strong>68–93 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость скрытой части</td>
+                        <td>80 плюс 16 плюс 48 равно <strong>144 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость чистовой части</td>
+                        <td>примерно <strong>40 человеко-дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 6: КЛАССИКА — ЭТАП 6 -->
+<div class="page">
+    <div class="section">
+        <div class="section-title">Этап 6. Полы (стяжка плюс чистовое покрытие)</div>
+        <div class="section-content">
+            
+            <div class="subsection">6.1. Цементно-песчаная стяжка 30–50 миллиметров</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-05-001, СНиП 3.04.01-87</td>
+                    </tr>
+                    <tr>
+                        <td>Толщина</td>
+                        <td>30–50 миллиметров, усреднённо 40 миллиметров</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,18 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>360 умножить на 0,18 равно <strong>64,8 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6 человек</td>
+                        <td><strong>11 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 8 человек</td>
+                        <td><strong>9 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>9–12 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">6.2. СУШКА СТЯЖКИ (КРИТИЧЕСКИЙ ПУТЬ)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СНиП 3.04.01-87 пункт 5.6, СП 71.13330.2017 пункт 5.5.3</td>
+                    </tr>
+                    <tr>
+                        <td>Толщина стяжки</td>
+                        <td>40 миллиметров</td>
+                    </tr>
+                    <tr>
+                        <td>Норма сушки</td>
+                        <td>7 суток на 10 миллиметров при 20 градусах Цельсия и влажности не более 60 процентов</td>
+                    </tr>
+                    <tr>
+                        <td>Расчёт</td>
+                        <td>40 разделить на 10 умножить на 7 равно <strong>28 суток</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Условия Москвы осень-зима влажность 70–80 процентов</td>
+                        <td>плюс 40–50 процентов времени</td>
+                    </tr>
+                    <tr>
+                        <td>Стандартная сушка</td>
+                        <td><strong>28–42 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Принудительное обогревание и вентиляция</td>
+                        <td>21–28 дней с риском трещин и вопросом гарантии</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Фактически принимаем минимум с мерами</td>
+                        <td><strong>21–28 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="dry-warning">
+                <strong>Критическое ограничение:</strong> укладка любого напольного покрытия на влажную стяжку приводит к деформации, плесени, отслоению. Гарантия производителя покрытия теряется.
+            </div>
+            
+            <div class="subsection">6.3. Укладка плитки (кухни, санузлы)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Площадь условно</td>
+                        <td>80 м² (2 санузла умножить на 8 квартир равно 16 санузлов, примерно 5 м² каждый)</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-06-001</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,25 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>80 умножить на 0,25 равно <strong>20 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>3–4 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">6.4. Сушка плиточного клея</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>СП 71.13330.2017 пункт 5.6.2</td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td>24–48 часов округляем до <strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">6.5. Затирка швов</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">6.6. Сушка затирки</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>1–2 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">6.7. Укладка ламината, паркетной доски, винилового покрытия</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Площадь</td>
+                        <td>280 м² (360 минус 80 плитка)</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-07-001</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,06 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>280 умножить на 0,06 равно <strong>16,8 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Итого этап 6</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Стяжка</td>
+                        <td>9–12 дней</td>
+                    </tr>
+                    <tr>
+                        <td>СУШКА СТЯЖКИ</td>
+                        <td>21–28 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Укладка плитки</td>
+                        <td>3–4 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Сушка клея</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Затирка</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Сушка затирки</td>
+                        <td>1–2 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Укладка ламината</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Общие сроки этапа</td>
+                        <td><strong>40–55 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Общая трудоёмкость</td>
+                        <td>64,8 плюс 20 плюс 16,8 равно <strong>101,6 человеко-дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 7: КЛАССИКА — ЭТАПЫ 7-8 -->
+<div class="page">
+    <div class="section">
+        <div class="section-title">Этап 7. Натяжной потолок</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Условие</td>
+                        <td>Выполняется после полной готовности стен и полов</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>Рыночная практика, не регламентировано ФЕР</td>
+                    </tr>
+                    <tr>
+                        <td>Площадь</td>
+                        <td>360 м²</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,02 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>360 умножить на 0,02 равно <strong>7,2 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>3–4 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка</td>
+                        <td>Не требуется</td>
+                    </tr>
+                    <tr class="subtotal-row">
+                        <td>Сроки этапа</td>
+                        <td><strong>3–4 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Этап 8. Финиш (двери, откосы, плинтуса, доработки)</div>
+        <div class="section-content">
+            
+            <div class="subsection">8.1. Установка межкомнатных и входных дверей</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Количество</td>
+                        <td>примерно 24 двери (3 умножить на 8 квартир)</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-09-001</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,5 человеко-дня на дверь</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>24 умножить на 0,5 равно <strong>12 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">8.2. Откосы штукатурные, пластиковые или гипсокартонные</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Площадь условно</td>
+                        <td>120 м²</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-02-004</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,20 человеко-дня на квадратный метр</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>120 умножить на 0,20 равно <strong>24 человеко-дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>3–4 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">8.3. Сушка откосов если штукатурные</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>3–5 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">8.4. Подоконники</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-09-002</td>
+                    </tr>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">8.5. Плинтуса напольные</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Длина</td>
+                        <td>примерно 200 метров</td>
+                    </tr>
+                    <tr>
+                        <td>Норматив</td>
+                        <td>ФЕР 46-07-002</td>
+                    </tr>
+                    <tr>
+                        <td>Норма времени</td>
+                        <td>0,03 человеко-дня на метр погонный</td>
+                    </tr>
+                    <tr>
+                        <td>Трудоёмкость</td>
+                        <td>200 умножить на 0,03 равно <strong>6 человеко-дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>При 6–8 человек</td>
+                        <td><strong>1–2 дня</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="subsection">8.6. Мелкий ремонт, доработки, уборка</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Сроки</td>
+                        <td><strong>5–7 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Итого этап 8</th>
+                        <th>Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Двери</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Откосы</td>
+                        <td>3–4 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Сушка откосов</td>
+                        <td>3–5 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Подоконники</td>
+                        <td>2–3 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Плинтуса</td>
+                        <td>1–2 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Доработки</td>
+                        <td>5–7 дня</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Общие сроки этапа</td>
+                        <td><strong>16–24 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Общая трудоёмкость</td>
+                        <td>12 плюс 24 плюс 6 равно <strong>42 человеко-дня</strong> плюс доработки</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 8: СВОДНАЯ ТАБЛИЦА КЛАССИКИ -->
+<div class="page">
+    <div class="header" style="padding:15px;">
+        <h1 style="font-size:14pt;">Сводная таблица: классический ремонт полностью</h1>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Полный перечень этапов с сушкой</div>
+        <div class="section-content">
+            <table style="font-size:7.5pt;">
+                <thead>
+                    <tr>
+                        <th style="width:4%;">№</th>
+                        <th style="width:26%;">Этап</th>
+                        <th style="width:14%;">Сроки работы</th>
+                        <th style="width:14%;">Сроки сушки</th>
+                        <th style="width:14%;">Итого этап</th>
+                        <th style="width:16%;">Трудоёмкость, чел.-дн.</th>
+                        <th style="width:12%;">Крит. путь</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Демонтаж плюс подготовка</td>
+                        <td>4–5 дней</td>
+                        <td>—</td>
+                        <td>4–5 дней</td>
+                        <td>28,8</td>
+                        <td>нет</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Шумоизоляция пол плюс стены плюс потолок</td>
+                        <td>31–40 дней</td>
+                        <td>—</td>
+                        <td>31–40 дней</td>
+                        <td>237,6</td>
+                        <td>ДА</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Штукатурка стен плюс потолков</td>
+                        <td>31–41 дней</td>
+                        <td>14–21 день</td>
+                        <td>45–62 дней</td>
+                        <td>243</td>
+                        <td>ДА</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Шпатлёвка плюс покраска</td>
+                        <td>34–43 дней</td>
+                        <td>2–3 дня</td>
+                        <td>36–46 дней</td>
+                        <td>252</td>
+                        <td>ДА</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Электрика плюс сантехника скрытая</td>
+                        <td>12–16 дней</td>
+                        <td>—</td>
+                        <td>12–16 дней</td>
+                        <td>144</td>
+                        <td>Параллельно</td>
+                    </tr>
+                    <tr>
+                        <td>5а</td>
+                        <td>Электрика плюс сантехника чистовая</td>
+                        <td>8–12 дней</td>
+                        <td>—</td>
+                        <td>8–12 дней</td>
+                        <td>40</td>
+                        <td>После 4</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Полы стяжка плюс покрытия</td>
+                        <td>19–25 дней</td>
+                        <td>21–28 дней</td>
+                        <td>40–55 дней</td>
+                        <td>101,6</td>
+                        <td>ДА</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>Натяжной потолок</td>
+                        <td>3–4 дня</td>
+                        <td>—</td>
+                        <td>3–4 дня</td>
+                        <td>7,2</td>
+                        <td>После 4 и 6</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Двери, откосы, плинтуса, доработки</td>
+                        <td>13–19 дней</td>
+                        <td>3–5 дней</td>
+                        <td>16–24 дня</td>
+                        <td>42+</td>
+                        <td>После всего</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3">КЛАССИКА оптимистичный сценарий</td>
+                        <td colspan="4">120–140 дней (4–4,7 месяца)</td>
+                    </tr>
+                    <tr class="total-row" style="background:#283593;">
+                        <td colspan="3">КЛАССИКА реалистичный сценарий</td>
+                        <td colspan="4">150–180 дней (5–6 месяцев)</td>
+                    </tr>
+                    <tr class="total-row" style="background:#c62828;">
+                        <td colspan="3">КЛАССИКА пессимистичный сценарий</td>
+                        <td colspan="4">180–240 дней (6–8 месяцев)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Критический путь классики (последовательно, без наложения этапов)</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Цепочка работ</th>
+                        <th>Сроки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Подготовка</td>
+                        <td>4–5 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Шумоизоляция</td>
+                        <td>31–40 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Штукатурка плюс сушка</td>
+                        <td>45–62 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Шпатлёвка плюс покраска плюс сушка</td>
+                        <td>36–46 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Полы: стяжка плюс сушка плюс покрытия</td>
+                        <td>40–55 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Натяжной потолок</td>
+                        <td>3–4 дня</td>
+                    </tr>
+                    <tr>
+                        <td>Чистовая сантехника и электрика</td>
+                        <td>8–12 дней</td>
+                    </tr>
+                    <tr>
+                        <td>Финиш: двери, откосы плюс сушка, плинтуса, доработки</td>
+                        <td>16–24 дня</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- СТРАНИЦА 9: ФИНАЛЬНОЕ СРАВНЕНИЕ -->
+<div class="page">
+    <div class="header">
+        <div class="logo-text">СРАВНИТЕЛЬНЫЙ АНАЛИЗ</div>
+        <h1>Капсула versus Классический ремонт</h1>
+    </div>
+    
+    <div class="comparison-grid">
+        <div class="comparison-card">
+            <div class="card-title">Технология «Капсула»</div>
+            <div class="days">26–38</div>
+            <div class="months">дней (0,9–1,3 месяца)</div>
+        </div>
+        <div class="comparison-card">
+            <div class="card-title">Классический ремонт</div>
+            <div class="days">120–180</div>
+            <div class="months">дней (4–6 месяцев)</div>
+        </div>
+    </div>
+    
+    <div class="highlight-box" style="margin:15px 0;">
+        <span class="big-number">3,2–4,6×</span>
+        <span class="label">ускорение сдачи объекта по технологии «Капсула»</span>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Ключевое различие: сроки сушки</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Критический фактор</th>
+                        <th>Капсула</th>
+                        <th>Классика</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Сушка штукатурки</td>
+                        <td>Нет (сухие технологии)</td>
+                        <td><strong>14–21 день</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка стяжки</td>
+                        <td>Нет (фальшпол)</td>
+                        <td><strong>21–28 дней</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка покраски</td>
+                        <td>Нет (панели)</td>
+                        <td><strong>2–3 дня</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Сушка откосов</td>
+                        <td>Нет</td>
+                        <td><strong>3–5 дней</strong></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Суммарная сушка</td>
+                        <td><strong>0 дней</strong></td>
+                        <td><strong>40–57 дней</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Сводные параметры сравнения</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Капсула</th>
+                        <th>Классика</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Общая площадь</td>
+                        <td>360 м²</td>
+                        <td>360 м²</td>
+                    </tr>
+                    <tr>
+                        <td>Количество квартир</td>
+                        <td>8 штук</td>
+                        <td>8 штук</td>
+                    </tr>
+                    <tr>
+                        <td>Средняя площадь квартиры</td>
+                        <td>45 м²</td>
+                        <td>45 м²</td>
+                    </tr>
+                    <tr>
+                        <td>Бригада</td>
+                        <td>6–8 человек</td>
+                        <td>6–8 человек</td>
+                    </tr>
+                    <tr>
+                        <td>Регион</td>
+                        <td>Москва и Московская область</td>
+                        <td>Москва и Московская область</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Общие сроки</td>
+                        <td>26–38 дней</td>
+                        <td>120–180 дней</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>В месяцах</td>
+                        <td>0,9–1,3</td>
+                        <td>4–6</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Экономический эффект ускорения</div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Показатель</th>
+                        <th>Расчёт</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Экономия времени на объект</td>
+                        <td>120 минус 38 равно <strong>82 дня минимум</strong> (реалистично 150 минус 32 равно <strong>118 дней</strong>)</td>
+                    </tr>
+                    <tr>
+                        <td>Ранний ввод в эксплуатацию</td>
+                        <td>Продажи, аренда, начало обслуживания ипотеки</td>
+                    </tr>
+                    <tr>
+                        <td>Сокращение накладных расходов</td>
+                        <td>Охрана, электроэнергия, амортизация оборудования</td>
+                    </tr>
+                    <tr>
+                        <td>Снижение рисков</td>
+                        <td>Меньше брака из-за недосушки, меньше претензий</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Коммерческое предложение подготовлено компанией «Капсула»</p>
+        <p>Расчёты выполнены на основании ФЕР-2001, ТСН-2001, СНиП 3.04.01-87, СП 71.13330.2017, СП 55-101-2000, СП 30.13330.2020, СП 76.13330.2016</p>
+        <p>Регион: Москва и Московская область. Дата подготовки: 2024 год.</p>
+    </div>
+</div>
+
+</body>
+</html>
