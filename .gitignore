@@ -1,0 +1,21 @@
+node_modules/
+dist/
+dist-web/
+*.log
+
+# Локальные данные и загрузки — никогда не попадают в git
+data/
+storage/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Секреты
+.env
+.env.*
+!.env.example
+
+# Тестовые артефакты
+coverage/
+tests/fixtures/private/
+.vitest/
