@@ -266,9 +266,11 @@ export async function completeUpload(
   }
 
   const digest = await sha256File(upload.storage_path);
-  db.prepare(
-    "UPDATE uploads SET status = 'complete', sha256 = ?, completed_at = ? WHERE id = ?",
-  ).run(digest, Date.now(), uploadId);
+  db.prepare("UPDATE uploads SET status = 'complete', sha256 = ?, completed_at = ? WHERE id = ?").run(
+    digest,
+    Date.now(),
+    uploadId,
+  );
 
   return getUpload(db, uploadId, userId);
 }

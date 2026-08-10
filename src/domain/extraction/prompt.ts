@@ -91,7 +91,9 @@ const INITIAL_STATE_LABELS: Record<string, string> = {
 export function renderObjectBrief(brief: ObjectBrief): string {
   const lines = [
     `Название объекта: ${brief.name}`,
-    brief.areaM2 !== null ? `Площадь по данным сотрудника: ${brief.areaM2} м²` : 'Площадь сотрудником не указана',
+    brief.areaM2 !== null
+      ? `Площадь по данным сотрудника: ${brief.areaM2} м²`
+      : 'Площадь сотрудником не указана',
     brief.rooms !== null ? `Количество комнат: ${brief.rooms}` : 'Количество комнат не указано',
     brief.initialState
       ? `Исходное состояние: ${INITIAL_STATE_LABELS[brief.initialState] ?? brief.initialState}`

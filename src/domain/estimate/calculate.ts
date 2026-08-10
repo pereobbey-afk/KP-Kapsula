@@ -115,9 +115,7 @@ export type ActiveVersion = {
 /** Активная версия прайса. Единственный источник расценок. */
 export function getActivePriceListVersion(db: Db): ActiveVersion {
   const row = db
-    .prepare(
-      'SELECT id, label, effective_date FROM price_list_versions WHERE is_active = 1 LIMIT 1',
-    )
+    .prepare('SELECT id, label, effective_date FROM price_list_versions WHERE is_active = 1 LIMIT 1')
     .get() as ActiveVersion | undefined;
   if (!row) throw new AppError('PRICE_LIST_MISSING');
   return row;
@@ -273,9 +271,7 @@ export function calculateEstimate(db: Db, input: CalculateInput): CalculatedEsti
     totalKopecks,
     areaMilli: input.areaMilli,
     pricePerM2Kopecks:
-      input.areaMilli && input.areaMilli > 0
-        ? pricePerSquareMeter(totalKopecks, input.areaMilli)
-        : null,
+      input.areaMilli && input.areaMilli > 0 ? pricePerSquareMeter(totalKopecks, input.areaMilli) : null,
     notes,
   };
 }
@@ -309,9 +305,7 @@ export function verifyAgainstPriceList(
       problems.push(`Позиция ${line.code}: идентификатор не совпадает с прайсом`);
     }
     if (item.unit !== line.unit) {
-      problems.push(
-        `Позиция ${line.code}: единица «${line.unit}» не совпадает с прайсом «${item.unit}»`,
-      );
+      problems.push(`Позиция ${line.code}: единица «${line.unit}» не совпадает с прайсом «${item.unit}»`);
     }
     if (item.price_kopecks !== line.priceKopecks) {
       problems.push(

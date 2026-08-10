@@ -39,9 +39,7 @@ function serializeJob(job: JobRow, events: ReturnType<typeof listJobEvents>) {
     attempts: job.attempts,
     maxAttempts: job.max_attempts,
     estimateId: job.estimate_id,
-    error: job.error_code
-      ? { code: job.error_code, message: job.error_message ?? '' }
-      : null,
+    error: job.error_code ? { code: job.error_code, message: job.error_message ?? '' } : null,
     createdAt: job.created_at,
     startedAt: job.started_at,
     finishedAt: job.finished_at,
@@ -107,7 +105,9 @@ export async function registerJobRoutes(app: FastifyInstance): Promise<void> {
 
     const created = db.transaction(() => {
       if (projectId) {
-        const owned = db.prepare('SELECT id FROM projects WHERE id = ? AND user_id = ?').get(projectId, user.id);
+        const owned = db
+          .prepare('SELECT id FROM projects WHERE id = ? AND user_id = ?')
+          .get(projectId, user.id);
         if (!owned) throw new AppError('NOT_FOUND');
       } else {
         projectId = newId('prj');
@@ -209,9 +209,7 @@ export async function registerJobRoutes(app: FastifyInstance): Promise<void> {
     const job = assertJobAccess(getJob(db, request.params.id), user.id);
 
     const files = db
-      .prepare(
-        `SELECT u.status FROM job_files jf JOIN uploads u ON u.id = jf.upload_id WHERE jf.job_id = ?`,
-      )
+      .prepare(`SELECT u.status FROM job_files jf JOIN uploads u ON u.id = jf.upload_id WHERE jf.job_id = ?`)
       .all(job.id) as Array<{ status: string }>;
 
     if (files.some((f) => f.status !== 'complete')) {

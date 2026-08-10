@@ -198,12 +198,7 @@ export function markUploadsReady(db: Db, jobId: string, now = Date.now()): boole
  * Один UPDATE ... RETURNING — два воркера не могут получить одну задачу.
  * Берутся и новые задачи, и те, чья аренда истекла (воркер умер).
  */
-export function claimNext(
-  db: Db,
-  workerId: string,
-  leaseMs: number,
-  now = Date.now(),
-): JobRow | null {
+export function claimNext(db: Db, workerId: string, leaseMs: number, now = Date.now()): JobRow | null {
   const row = db
     .prepare(
       `UPDATE jobs
@@ -486,7 +481,5 @@ export function recordEvent(
 }
 
 export function listJobEvents(db: Db, jobId: string): JobEventRow[] {
-  return db
-    .prepare('SELECT * FROM job_events WHERE job_id = ? ORDER BY id ASC')
-    .all(jobId) as JobEventRow[];
+  return db.prepare('SELECT * FROM job_events WHERE job_id = ? ORDER BY id ASC').all(jobId) as JobEventRow[];
 }

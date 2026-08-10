@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { mergeEditions, formatImportSummary, type PriceEdition } from '../src/domain/pricelist/import.js';
-import { matchKey, normalizeUnit, normalizeText, deriveCode, parseSectionNo } from '../src/domain/pricelist/normalize.js';
+import {
+  matchKey,
+  normalizeUnit,
+  normalizeText,
+  deriveCode,
+  parseSectionNo,
+} from '../src/domain/pricelist/normalize.js';
 
 describe('нормализация', () => {
   it('единицы измерения приводятся к канону', () => {

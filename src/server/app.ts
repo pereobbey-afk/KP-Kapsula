@@ -1,5 +1,7 @@
+import fs from 'node:fs';
 import Fastify, { type FastifyInstance } from 'fastify';
 import cookie from '@fastify/cookie';
+import fastifyStatic from '@fastify/static';
 import rateLimit from '@fastify/rate-limit';
 import type { Db } from '../db/index.js';
 import type { AppConfig } from '../shared/config.js';
@@ -18,6 +20,14 @@ export type AppDeps = {
   db: Db;
   config: AppConfig;
   logger?: Logger;
+  /**
+   * Каталог собранного интерфейса. Если задан, приложение отдаёт статику
+   * и возвращает index.html для маршрутов SPA.
+   *
+   * Регистрируется здесь, а не снаружи: Fastify допускает только один
+   * обработчик 404 на экземпляр, и он же обязан отдавать JSON для /api.
+   */
+  webRoot?: string;
 };
 
 export type AppContext = {
@@ -128,20 +138,29 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     });
   });
 
+  const serveWeb = Boolean(deps.webRoot && fs.existsSync(deps.webRoot));
+  if (deps.webRoot && !serveWeb) {
+    logger.warn('Каталог интерфейса не найден — отдаётся только API', { webRoot: deps.webRoot });
+  }
+  if (serveWeb) {
+    await app.register(fastifyStatic, { root: deps.webRoot!, prefix: '/' });
+  }
+
   /**
-   * 404 для API — строго JSON.
-   * Если сюда вернуть HTML, клиент получит «Unexpected token '<'».
+   * Единственный обработчик 404 на приложение.
+   *
+   * Для /api — строго JSON: HTML на месте JSON и давал пользователю
+   * «Unexpected token '<'». Остальные пути уходят в SPA.
    */
   app.setNotFoundHandler((request, reply) => {
-    if (request.url.startsWith('/api')) {
+    if (request.url.startsWith('/api') || !serveWeb) {
       void reply.status(404).send({
         ...publicErrorBody(new AppError('NOT_FOUND')),
         requestId: request.requestId,
       });
       return;
     }
-    // Остальное отдаёт SPA-фолбэк, регистрируемый в main.ts.
-    void reply.callNotFound();
+    void reply.sendFile('index.html');
   });
 
   app.get('/api/health', async () => {

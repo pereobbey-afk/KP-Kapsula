@@ -23,7 +23,13 @@ const db = openDatabase(cfg.databasePath);
 const provider = createExtractionProvider({
   apiKey: cfg.anthropicApiKey,
   model: cfg.extractionModel,
+  baseURL: cfg.anthropicBaseUrl,
 });
+
+if (cfg.anthropicBaseUrl) {
+  // Документация уходит не на стандартный адрес — это должно быть видно в логе.
+  logger.warn('Используется нестандартный адрес ИИ API', { baseUrl: cfg.anthropicBaseUrl });
+}
 
 if (!cfg.anthropicApiKey) {
   logger.warn(

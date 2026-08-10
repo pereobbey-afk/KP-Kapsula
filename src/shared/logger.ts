@@ -30,7 +30,10 @@ export function sanitizeLogFields(value: unknown, depth = 0): unknown {
   if (typeof value === 'object') {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      out[k] = SECRET_KEYS.test(k) ? '[скрыто]' : sanitizeLogFields(v, depth + 1);
+      // Маскируются только строковые значения: секрет — это всегда строка.
+      // Числа с «секретными» именами (например, счётчики токенов) нужны
+      // для диагностики расходов и не несут тайны.
+      out[k] = SECRET_KEYS.test(k) && typeof v === 'string' ? '[скрыто]' : sanitizeLogFields(v, depth + 1);
     }
     return out;
   }

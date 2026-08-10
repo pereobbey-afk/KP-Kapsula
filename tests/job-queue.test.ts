@@ -129,9 +129,7 @@ describe('смерть воркера не убивает задачу', () => {
 
     // Ожил и пытается продлить аренду и завершить — обе операции отклонены.
     expect(heartbeat(db, job.id, 'dead-worker', 10_000, t0 + 12_000)).toBe(false);
-    expect(setStage(db, job.id, 'dead-worker', 'calculating', 10_000, undefined, t0 + 12_000)).toBe(
-      false,
-    );
+    expect(setStage(db, job.id, 'dead-worker', 'calculating', 10_000, undefined, t0 + 12_000)).toBe(false);
     expect(completeJob(db, job.id, 'dead-worker', 'est_x', versionId, t0 + 12_000)).toBe(false);
 
     expect(getJob(db, job.id)!.status).not.toBe('completed');

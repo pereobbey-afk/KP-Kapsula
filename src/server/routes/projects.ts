@@ -57,7 +57,13 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
                FROM estimates WHERE project_id = ? ORDER BY revision DESC LIMIT 1`,
           )
           .get(row.id) as
-          | { id: string; total_kopecks: number; revision: number; is_preliminary: number; created_at: number }
+          | {
+              id: string;
+              total_kopecks: number;
+              revision: number;
+              is_preliminary: number;
+              created_at: number;
+            }
           | undefined;
 
         return {
@@ -79,8 +85,7 @@ export async function registerProjectRoutes(app: FastifyInstance): Promise<void>
   app.get<{ Params: { id: string } }>('/api/projects/:id', async (request) => {
     const user = requireUser(request);
     const row = db.prepare('SELECT * FROM projects WHERE id = ?').get(request.params.id) as
-      | ProjectRow
-      | undefined;
+      ProjectRow | undefined;
     // Чужой проект неотличим от несуществующего.
     if (!row || row.user_id !== user.id) throw new AppError('NOT_FOUND');
 

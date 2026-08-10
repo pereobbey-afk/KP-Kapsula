@@ -83,9 +83,7 @@ export async function processJob(ctx: PipelineContext, job: JobRow): Promise<voi
     // ---------- Этап: классификация и подготовка ----------
     const stageClassify = Date.now();
     const project = ctx.db
-      .prepare(
-        'SELECT id, name, area_milli, rooms, initial_state, scope_level FROM projects WHERE id = ?',
-      )
+      .prepare('SELECT id, name, area_milli, rooms, initial_state, scope_level FROM projects WHERE id = ?')
       .get(job.project_id) as ProjectRow | undefined;
     if (!project) throw new AppError('NOT_FOUND', { reason: 'проект задачи не найден' });
 
@@ -99,7 +97,9 @@ export async function processJob(ctx: PipelineContext, job: JobRow): Promise<voi
     const documents = await loadDocuments(ctx, files, log);
     const version = getActivePriceListVersion(ctx.db);
     const catalogue = ctx.db
-      .prepare('SELECT code, section, name, unit FROM price_items WHERE version_id = ? ORDER BY section_no, name')
+      .prepare(
+        'SELECT code, section, name, unit FROM price_items WHERE version_id = ? ORDER BY section_no, name',
+      )
       .all(version.id) as Array<{ code: string; section: string; name: string; unit: string }>;
 
     if (catalogue.length === 0) throw new AppError('PRICE_LIST_MISSING');
@@ -189,14 +189,12 @@ export async function processJob(ctx: PipelineContext, job: JobRow): Promise<voi
       unknowns: outcome.result.unknowns.map((u) => ({ title: u.title, detail: u.detail })),
       assumptions: [
         ...validationNotes,
-        ...outcome.result.assumptions.map(
-          (a): EstimateNoteDraft => ({
-            kind: 'assumption',
-            severity: 'info',
-            title: a.title,
-            detail: a.detail,
-          }),
-        ),
+        ...outcome.result.assumptions.map((a): EstimateNoteDraft => ({
+          kind: 'assumption',
+          severity: 'info',
+          title: a.title,
+          detail: a.detail,
+        })),
         ...buildDocumentNotes(outcome.result),
       ],
       versionId: version.id,
@@ -312,8 +310,7 @@ export function mapFactsToClaims(
         severity: 'critical',
         title: `Работа не найдена в активном прайсе: ${fact.code}`,
         detail:
-          `Извлечено из документа как «${fact.documentWording ?? fact.code}». ` +
-          'В расчёт не включено.',
+          `Извлечено из документа как «${fact.documentWording ?? fact.code}». ` + 'В расчёт не включено.',
       });
       continue;
     }

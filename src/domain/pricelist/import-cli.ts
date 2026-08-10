@@ -126,7 +126,9 @@ async function main(): Promise<void> {
         // Не угадываем раскладку вслепую — показываем, что нашли.
         out(`  Лист «${sheet.sheet}»: колонки не распознаны.`);
         out(`  Найденные заголовки: ${sheet.detectedHeaders.join(' | ') || '(нет)'}`);
-        out('  Задайте колонки явно: --col-name N --col-unit N --col-price N [--col-section N] [--col-code N]');
+        out(
+          '  Задайте колонки явно: --col-name N --col-unit N --col-price N [--col-section N] [--col-code N]',
+        );
         continue;
       }
       out(
@@ -156,7 +158,11 @@ async function main(): Promise<void> {
 
     const result = importPriceList(db, {
       label: args.label,
-      effectiveDate: args.files.map((f) => f.date).sort().at(-1) ?? null,
+      effectiveDate:
+        args.files
+          .map((f) => f.date)
+          .sort()
+          .at(-1) ?? null,
       sourceNote: args.files.map((f) => `${path.basename(f.path)} (${f.label})`).join('; '),
       editions,
       activate: args.activate,
@@ -176,7 +182,10 @@ async function main(): Promise<void> {
   }
 }
 
-function printReport(report: ReturnType<typeof import('./import.js').mergeEditions>['report'], out: (s: string) => void): void {
+function printReport(
+  report: ReturnType<typeof import('./import.js').mergeEditions>['report'],
+  out: (s: string) => void,
+): void {
   out(formatImportSummary(report));
 
   out('\nРазделы:');
@@ -187,7 +196,9 @@ function printReport(report: ReturnType<typeof import('./import.js').mergeEditio
   if (report.overridden.length > 0) {
     out(`\nВытеснено свежей редакцией: ${report.overridden.length}. Первые 10:`);
     for (const o of report.overridden.slice(0, 10)) {
-      out(`  «${o.name}»: ${o.oldPriceKopecks / 100} → ${o.newPriceKopecks / 100} (${o.fromEdition} → ${o.toEdition})`);
+      out(
+        `  «${o.name}»: ${o.oldPriceKopecks / 100} → ${o.newPriceKopecks / 100} (${o.fromEdition} → ${o.toEdition})`,
+      );
     }
   }
 

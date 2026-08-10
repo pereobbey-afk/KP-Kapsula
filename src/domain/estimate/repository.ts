@@ -107,7 +107,15 @@ export function saveEstimate(db: Db, input: SaveEstimateInput): string {
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
     );
     notes.forEach((note, index) => {
-      insertNote.run(newId('nte'), estimateId, note.kind, note.severity, note.title, note.detail ?? null, index);
+      insertNote.run(
+        newId('nte'),
+        estimateId,
+        note.kind,
+        note.severity,
+        note.title,
+        note.detail ?? null,
+        index,
+      );
     });
 
     db.prepare(
@@ -191,8 +199,7 @@ export type FullEstimate = {
 
 export function getEstimate(db: Db, estimateId: string): FullEstimate | null {
   const estimate = db.prepare('SELECT * FROM estimates WHERE id = ?').get(estimateId) as
-    | EstimateRow
-    | undefined;
+    EstimateRow | undefined;
   if (!estimate) return null;
 
   return {

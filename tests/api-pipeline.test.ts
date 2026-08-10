@@ -26,10 +26,31 @@ import { kopecksToRubles } from '../src/shared/money.js';
 const PDF_SIZE = 2_338_193;
 
 const PRICE_ROWS = [
-  { code: 'W-PLASTER', name: 'Штукатурка стен', unit: 'м2', priceKopecks: 45000, section: 'Стены', sectionNo: 1 },
-  { code: 'W-PUTTY', name: 'Шпаклевка стен', unit: 'м2', priceKopecks: 25000, section: 'Стены', sectionNo: 1 },
+  {
+    code: 'W-PLASTER',
+    name: 'Штукатурка стен',
+    unit: 'м2',
+    priceKopecks: 45000,
+    section: 'Стены',
+    sectionNo: 1,
+  },
+  {
+    code: 'W-PUTTY',
+    name: 'Шпаклевка стен',
+    unit: 'м2',
+    priceKopecks: 25000,
+    section: 'Стены',
+    sectionNo: 1,
+  },
   { code: 'W-SCREED', name: 'Стяжка пола', unit: 'м2', priceKopecks: 50000, section: 'Полы', sectionNo: 2 },
-  { code: 'W-SOCKET', name: 'Установка розетки', unit: 'шт', priceKopecks: 35000, section: 'Электрика', sectionNo: 3 },
+  {
+    code: 'W-SOCKET',
+    name: 'Установка розетки',
+    unit: 'шт',
+    priceKopecks: 35000,
+    section: 'Электрика',
+    sectionNo: 3,
+  },
 ];
 
 let tmpDir: string;
@@ -179,7 +200,13 @@ async function startJob(uploadIds: string[], idempotencyKey = 'key-' + Math.rand
     payload: {
       idempotencyKey,
       uploadIds,
-      project: { name: 'Квартира на Ленина', areaM2: 50, rooms: 2, initialState: 'concrete', scopeLevel: 'Полный ремонт' },
+      project: {
+        name: 'Квартира на Ленина',
+        areaM2: 50,
+        rooms: 2,
+        initialState: 'concrete',
+        scopeLevel: 'Полный ремонт',
+      },
     },
   });
   return res;
@@ -309,7 +336,11 @@ describe('4. временный обрыв сети не уничтожает з
     }
 
     // Завершение отклоняется, но загрузка не потеряна.
-    const early = await app.inject({ method: 'POST', url: `/api/uploads/${uploadId}/complete`, headers: { cookie } });
+    const early = await app.inject({
+      method: 'POST',
+      url: `/api/uploads/${uploadId}/complete`,
+      headers: { cookie },
+    });
     expect(early.statusCode).toBe(409);
     expect(early.json().error.code).toBe('UPLOAD_INCOMPLETE');
 
@@ -327,7 +358,11 @@ describe('4. временный обрыв сети не уничтожает з
       expect(res.statusCode).toBe(200);
     }
 
-    const complete = await app.inject({ method: 'POST', url: `/api/uploads/${uploadId}/complete`, headers: { cookie } });
+    const complete = await app.inject({
+      method: 'POST',
+      url: `/api/uploads/${uploadId}/complete`,
+      headers: { cookie },
+    });
     expect(complete.statusCode).toBe(200);
     // Двойная отправка части не раздула размер.
     expect(complete.json().size).toBe(pdf.length);
@@ -387,7 +422,9 @@ describe('6. ошибка этапа понятна и допускает без
 
     await runWorkerUntilDone(jobId);
 
-    const status = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json();
+    const status = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json();
     expect(status.status).toBe('failed');
     expect(status.error.code).toBe('PDF_PASSWORD_PROTECTED');
     expect(status.error.message).toContain('паролем');
@@ -436,8 +473,9 @@ describe('7. классификация документа', () => {
 
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
     const estimate = (
       await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
     ).json();
@@ -451,8 +489,9 @@ describe('7. классификация документа', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
     const estimate = (
       await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
     ).json();
@@ -468,9 +507,12 @@ describe('8-9. содержимое сметы', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
-    const body = (await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })).json();
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
+    const body = (
+      await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
+    ).json();
 
     // Розетки объявлены неизвестными — строки для них нет.
     expect(body.lines.some((l: { code: string }) => l.code === 'W-SOCKET')).toBe(false);
@@ -489,9 +531,12 @@ describe('8-9. содержимое сметы', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
-    const body = (await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })).json();
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
+    const body = (
+      await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
+    ).json();
 
     for (const line of body.lines) {
       const item = PRICE_ROWS.find((r) => r.code === line.code)!;
@@ -511,9 +556,12 @@ describe('8-9. содержимое сметы', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
-    const body = (await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })).json();
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
+    const body = (
+      await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
+    ).json();
 
     const plaster = body.lines.find((l: { code: string }) => l.code === 'W-PLASTER');
     expect(plaster.confidence).toBe('confirmed');
@@ -528,9 +576,12 @@ describe('10-11. защита цены и ручные правки', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
-    const before = (await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })).json();
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
+    const before = (
+      await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
+    ).json();
     const line = before.lines[0];
 
     // Пытаемся протащить свою цену и сумму вместе с правкой объёма.
@@ -552,9 +603,12 @@ describe('10-11. защита цены и ручные правки', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
-    const before = (await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })).json();
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
+    const before = (
+      await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
+    ).json();
     const line = before.lines.find((l: { code: string }) => l.code === 'W-PLASTER');
     expect(line.confidence).toBe('confirmed');
 
@@ -576,8 +630,9 @@ describe('10-11. защита цены и ручные правки', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
 
     const res = await app.inject({
       method: 'POST',
@@ -598,8 +653,9 @@ describe('10-11. защита цены и ручные правки', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
 
     const res = await app.inject({
       method: 'POST',
@@ -619,8 +675,9 @@ describe('12. проект сохраняется и восстанавлива�
     const { jobId, projectId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
     await app.inject({
       method: 'POST',
       url: `/api/estimates/${estimateId}/lines`,
@@ -632,7 +689,9 @@ describe('12. проект сохраняется и восстанавлива�
     expect(list.projects).toHaveLength(1);
     expect(list.projects[0].latestEstimate.id).toBe(estimateId);
 
-    const detail = (await app.inject({ method: 'GET', url: `/api/projects/${projectId}`, headers: { cookie } })).json();
+    const detail = (
+      await app.inject({ method: 'GET', url: `/api/projects/${projectId}`, headers: { cookie } })
+    ).json();
     expect(detail.project.name).toBe('Квартира на Ленина');
     expect(detail.estimates).toHaveLength(1);
 
@@ -674,9 +733,12 @@ describe('13. экспорт .xlsx открывается и совпадает 
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const estimateId = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json()
-      .estimateId;
-    const ui = (await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })).json();
+    const estimateId = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json().estimateId;
+    const ui = (
+      await app.inject({ method: 'GET', url: `/api/estimates/${estimateId}`, headers: { cookie } })
+    ).json();
 
     const res = await app.inject({
       method: 'GET',
@@ -701,7 +763,13 @@ describe('13. экспорт .xlsx открывается и совпадает 
       const qty = row.getCell(6).value;
       const price = row.getCell(7).value;
       const amount = row.getCell(8).value;
-      if (typeof qty === 'number' && typeof price === 'number' && amount && typeof amount === 'object' && 'formula' in amount) {
+      if (
+        typeof qty === 'number' &&
+        typeof price === 'number' &&
+        amount &&
+        typeof amount === 'object' &&
+        'formula' in amount
+      ) {
         rows.push({ qty, price, formula: (amount as { formula: string }).formula });
       }
     });
@@ -727,7 +795,9 @@ describe('наблюдаемость: тайминги этапов', () => {
     const { jobId } = (await startJob([uploadId])).json();
     await runWorkerUntilDone(jobId);
 
-    const status = (await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })).json();
+    const status = (
+      await app.inject({ method: 'GET', url: `/api/jobs/${jobId}`, headers: { cookie } })
+    ).json();
     const statuses = status.timeline.map((t: { status: string }) => t.status);
 
     expect(statuses).toContain('queued');
@@ -736,6 +806,8 @@ describe('наблюдаемость: тайминги этапов', () => {
     expect(statuses).toContain('calculating');
     expect(statuses).toContain('completed');
     // У завершённых этапов есть измеренная длительность.
-    expect(status.timeline.filter((t: { durationMs: number | null }) => t.durationMs !== null).length).toBeGreaterThan(0);
+    expect(
+      status.timeline.filter((t: { durationMs: number | null }) => t.durationMs !== null).length,
+    ).toBeGreaterThan(0);
   });
 });

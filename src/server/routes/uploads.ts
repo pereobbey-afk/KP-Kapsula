@@ -58,21 +58,18 @@ export async function registerUploadRoutes(app: FastifyInstance): Promise<void> 
    * Тело — двоичные данные. Повторная отправка той же части безопасна,
    * поэтому обрыв сети не начинает загрузку заново.
    */
-  app.put<{ Params: { id: string; index: string } }>(
-    '/api/uploads/:id/chunks/:index',
-    async (request) => {
-      const user = requireUser(request);
-      const chunkIndex = Number(request.params.index);
-      const body = request.body;
+  app.put<{ Params: { id: string; index: string } }>('/api/uploads/:id/chunks/:index', async (request) => {
+    const user = requireUser(request);
+    const chunkIndex = Number(request.params.index);
+    const body = request.body;
 
-      if (!Buffer.isBuffer(body)) {
-        throw new AppError('UPLOAD_CHUNK_FAILED', { reason: 'ожидаются двоичные данные' });
-      }
+    if (!Buffer.isBuffer(body)) {
+      throw new AppError('UPLOAD_CHUNK_FAILED', { reason: 'ожидаются двоичные данные' });
+    }
 
-      const progress = await writeChunk(db, request.params.id, user.id, chunkIndex, body);
-      return progress;
-    },
-  );
+    const progress = await writeChunk(db, request.params.id, user.id, chunkIndex, body);
+    return progress;
+  });
 
   /** Какие части ещё не получены — для возобновления после обрыва. */
   app.get<{ Params: { id: string } }>('/api/uploads/:id', async (request) => {

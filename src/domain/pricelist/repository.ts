@@ -113,9 +113,7 @@ export type VersionRow = {
 };
 
 export function listVersions(db: Db): VersionRow[] {
-  return db
-    .prepare('SELECT * FROM price_list_versions ORDER BY created_at DESC')
-    .all() as VersionRow[];
+  return db.prepare('SELECT * FROM price_list_versions ORDER BY created_at DESC').all() as VersionRow[];
 }
 
 export function getActiveVersionOrNull(db: Db): VersionRow | null {
@@ -156,14 +154,16 @@ export function searchActiveItems(db: Db, query: string, limit = 50): PriceItemP
         )
         .all(active.id, limit) as Array<Record<string, never>>);
 
-  return (rows as unknown as Array<{
-    code: string;
-    section: string;
-    section_no: number | null;
-    name: string;
-    unit: string;
-    price_kopecks: number;
-  }>).map((r) => ({
+  return (
+    rows as unknown as Array<{
+      code: string;
+      section: string;
+      section_no: number | null;
+      name: string;
+      unit: string;
+      price_kopecks: number;
+    }>
+  ).map((r) => ({
     code: r.code,
     section: r.section,
     sectionNo: r.section_no,

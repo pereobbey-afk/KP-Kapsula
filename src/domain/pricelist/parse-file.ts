@@ -51,9 +51,7 @@ export function detectColumns(
     for (let c = 0; c < cells.length; c += 1) {
       const value = cells[c] ?? '';
       if (!value) continue;
-      for (const [field, patterns] of Object.entries(HEADER_PATTERNS) as Array<
-        [keyof ColumnMap, RegExp[]]
-      >) {
+      for (const [field, patterns] of Object.entries(HEADER_PATTERNS) as Array<[keyof ColumnMap, RegExp[]]>) {
         if (found[field] !== undefined) continue;
         if (patterns.some((p) => p.test(value))) found[field] = c;
       }
@@ -115,7 +113,10 @@ function toRawRows(
   return rows;
 }
 
-export async function parseXlsx(filePath: string, override?: Partial<ColumnMap>): Promise<SheetParseResult[]> {
+export async function parseXlsx(
+  filePath: string,
+  override?: Partial<ColumnMap>,
+): Promise<SheetParseResult[]> {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(filePath);
 
@@ -136,11 +137,12 @@ export async function parseXlsx(filePath: string, override?: Partial<ColumnMap>)
 
     results.push({
       sheet: sheet.name,
-      rows: map && 'headerRow' in detected && detected.headerRow !== undefined
-        ? toRawRows(grid, map, detected.headerRow, sheet.name)
-        : map
-          ? toRawRows(grid, map, 0, sheet.name)
-          : [],
+      rows:
+        map && 'headerRow' in detected && detected.headerRow !== undefined
+          ? toRawRows(grid, map, detected.headerRow, sheet.name)
+          : map
+            ? toRawRows(grid, map, 0, sheet.name)
+            : [],
       columnMap: map,
       headerRow: 'headerRow' in detected ? detected.headerRow : null,
       detectedHeaders: detected.headers,
@@ -183,10 +185,7 @@ export async function parsePriceFile(
   throw new Error(`Неподдерживаемый формат прайса: ${ext}. Ожидается .xlsx или .csv`);
 }
 
-function mergeColumnMap(
-  detected: ColumnMap | null,
-  override?: Partial<ColumnMap>,
-): ColumnMap | null {
+function mergeColumnMap(detected: ColumnMap | null, override?: Partial<ColumnMap>): ColumnMap | null {
   if (!override || Object.keys(override).length === 0) return detected;
 
   const merged = { ...(detected ?? {}), ...override } as Partial<ColumnMap>;

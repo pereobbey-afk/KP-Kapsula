@@ -1,5 +1,12 @@
 import { parsePriceToKopecks, type Kopecks } from '../../shared/money.js';
-import { deriveCode, matchKey, normalizeText, normalizeUnit, parseSectionNo, searchText } from './normalize.js';
+import {
+  deriveCode,
+  matchKey,
+  normalizeText,
+  normalizeUnit,
+  parseSectionNo,
+  searchText,
+} from './normalize.js';
 
 /**
  * Объединение редакций прайс-листа.
@@ -120,7 +127,12 @@ export function mergeEditions(editions: readonly PriceEdition[]): MergeResult {
 
       if (looksLikeSectionHeader(row)) {
         currentSection = name;
-        rejected.push({ edition: edition.label, sourceRow: row.sourceRow ?? null, reason: 'section_header', raw: row });
+        rejected.push({
+          edition: edition.label,
+          sourceRow: row.sourceRow ?? null,
+          reason: 'section_header',
+          raw: row,
+        });
         rejectedHere += 1;
         continue;
       }
@@ -207,9 +219,7 @@ export function mergeEditions(editions: readonly PriceEdition[]): MergeResult {
     if (entry) entry.items += 1;
     else sectionMap.set(item.section, { sectionNo: item.sectionNo, section: item.section, items: 1 });
   }
-  const sections = [...sectionMap.values()].sort(
-    (a, b) => (a.sectionNo ?? 1e9) - (b.sectionNo ?? 1e9),
-  );
+  const sections = [...sectionMap.values()].sort((a, b) => (a.sectionNo ?? 1e9) - (b.sectionNo ?? 1e9));
 
   return {
     items,

@@ -27,6 +27,10 @@ const schema = z.object({
   SESSION_TTL_HOURS: intFromEnv(12),
 
   ANTHROPIC_API_KEY: z.string().optional(),
+  // Переопределение адреса ИИ API. Читается явно, а не через
+  // умолчание SDK: иначе посторонняя переменная окружения могла бы
+  // незаметно перенаправить запросы с документацией на чужой хост.
+  ANTHROPIC_BASE_URL: z.string().optional(),
   EXTRACTION_MODEL: z.string().default('claude-opus-5'),
 
   MAX_FILE_BYTES: intFromEnv(64 * 1024 * 1024),
@@ -52,6 +56,7 @@ export type AppConfig = Readonly<{
   sessionSecret: string;
   sessionTtlMs: number;
   anthropicApiKey: string | undefined;
+  anthropicBaseUrl: string | undefined;
   extractionModel: string;
   maxFileBytes: number;
   maxFilesPerJob: number;
@@ -94,6 +99,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     sessionSecret: e.SESSION_SECRET ?? 'dev-only-insecure-secret-do-not-use-in-production',
     sessionTtlMs: e.SESSION_TTL_HOURS * 3600_000,
     anthropicApiKey: e.ANTHROPIC_API_KEY || undefined,
+    anthropicBaseUrl: e.ANTHROPIC_BASE_URL || undefined,
     extractionModel: e.EXTRACTION_MODEL,
     maxFileBytes: e.MAX_FILE_BYTES,
     maxFilesPerJob: e.MAX_FILES_PER_JOB,

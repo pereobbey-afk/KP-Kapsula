@@ -1,0 +1,8 @@
+dist/
+dist-web/
+node_modules/
+data/
+storage/
+coverage/
+package-lock.json
+123

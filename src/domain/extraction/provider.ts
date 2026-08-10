@@ -208,6 +208,7 @@ export function mapProviderError(e: unknown): AppError {
 export function createExtractionProvider(opts: {
   apiKey: string | undefined;
   model: string;
+  baseURL?: string | undefined;
 }): ExtractionProvider {
   if (!opts.apiKey) {
     return {
@@ -216,5 +217,9 @@ export function createExtractionProvider(opts: {
       },
     };
   }
-  return new AnthropicExtractionProvider({ apiKey: opts.apiKey, model: opts.model });
+  return new AnthropicExtractionProvider({
+    apiKey: opts.apiKey,
+    model: opts.model,
+    ...(opts.baseURL ? { baseURL: opts.baseURL } : {}),
+  });
 }

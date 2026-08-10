@@ -39,21 +39,20 @@ export async function createUser(
   if (existing) throw new AppError('VALIDATION_FAILED', { field: 'email', reason: 'уже зарегистрирован' });
 
   const id = newId('usr');
-  db.prepare(
-    'INSERT INTO users (id, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)',
-  ).run(id, email, await hashPassword(input.password), input.role ?? 'user', Date.now());
+  db.prepare('INSERT INTO users (id, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?)').run(
+    id,
+    email,
+    await hashPassword(input.password),
+    input.role ?? 'user',
+    Date.now(),
+  );
 
   return { id, email, role: input.role ?? 'user' };
 }
 
-export async function authenticate(
-  db: Db,
-  email: string,
-  password: string,
-): Promise<SessionUser | null> {
-  const user = db
-    .prepare('SELECT * FROM users WHERE lower(email) = ?')
-    .get(email.trim().toLowerCase()) as UserRow | undefined;
+export async function authenticate(db: Db, email: string, password: string): Promise<SessionUser | null> {
+  const user = db.prepare('SELECT * FROM users WHERE lower(email) = ?').get(email.trim().toLowerCase()) as
+    UserRow | undefined;
 
   // Пароль проверяется даже при отсутствии пользователя, чтобы время
   // ответа не выдавало, существует ли учётная запись.
@@ -91,8 +90,7 @@ export function resolveSession(db: Db, token: string | undefined): SessionUser |
         WHERE s.id = ?`,
     )
     .get(sha256(token)) as
-    | { expires_at: number; id: string; email: string; role: 'user' | 'admin' }
-    | undefined;
+    { expires_at: number; id: string; email: string; role: 'user' | 'admin' } | undefined;
 
   if (!row) return null;
   if (row.expires_at <= Date.now()) {

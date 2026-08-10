@@ -132,7 +132,10 @@ export const EXTRACTION_TOOL_SCHEMA = {
             properties: {
               file: { type: 'string', description: 'Имя файла.' },
               page: { type: ['integer', 'null'], description: 'Номер страницы/листа.' },
-              ref: { type: ['string', 'null'], description: 'Указатель на фрагмент: лист, таблица, экспликация.' },
+              ref: {
+                type: ['string', 'null'],
+                description: 'Указатель на фрагмент: лист, таблица, экспликация.',
+              },
             },
             required: ['file', 'page', 'ref'],
           },

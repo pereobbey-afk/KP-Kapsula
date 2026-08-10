@@ -22,7 +22,9 @@ export type WorkerRunner = {
   tick: () => Promise<number>;
 };
 
-export function createWorkerRunner(ctx: PipelineContext & { db: Db; config: AppConfig; logger: Logger }): WorkerRunner {
+export function createWorkerRunner(
+  ctx: PipelineContext & { db: Db; config: AppConfig; logger: Logger },
+): WorkerRunner {
   const inFlight = new Set<Promise<void>>();
   let stopped = false;
   let loopTimer: NodeJS.Timeout | null = null;
@@ -92,7 +94,8 @@ export function createWorkerRunner(ctx: PipelineContext & { db: Db; config: AppC
     loopTimer = setTimeout(() => {
       void tick().finally(scheduleLoop);
     }, 1000);
-    loopTimer.unref?.();
+    // Таймер НЕ снимается с учёта (unref): он единственное, что держит
+    // процесс воркера живым. Остановка выполняется явно через stop().
   }
 
   return {
@@ -105,7 +108,6 @@ export function createWorkerRunner(ctx: PipelineContext & { db: Db; config: AppC
       });
       scheduleLoop();
       maintenanceTimer = setInterval(() => void maintenance(), 60_000);
-      maintenanceTimer.unref?.();
       void maintenance();
     },
 

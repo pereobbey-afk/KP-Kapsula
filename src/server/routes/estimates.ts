@@ -37,14 +37,12 @@ function recalcTotals(db: Db, estimateId: string): void {
     .all(estimateId) as Array<{ amount_kopecks: number }>;
 
   const total = sumKopecks(lines.map((l) => l.amount_kopecks));
-  const estimate = db
-    .prepare('SELECT area_milli FROM estimates WHERE id = ?')
-    .get(estimateId) as { area_milli: number | null };
+  const estimate = db.prepare('SELECT area_milli FROM estimates WHERE id = ?').get(estimateId) as {
+    area_milli: number | null;
+  };
 
   const perM2 =
-    estimate.area_milli && estimate.area_milli > 0
-      ? pricePerSquareMeter(total, estimate.area_milli)
-      : null;
+    estimate.area_milli && estimate.area_milli > 0 ? pricePerSquareMeter(total, estimate.area_milli) : null;
 
   db.prepare('UPDATE estimates SET total_kopecks = ?, price_per_m2_kopecks = ? WHERE id = ?').run(
     total,
@@ -84,9 +82,8 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
     const user = requireUser(request);
     const { estimate, lines, notes } = getEstimateForUser(db, request.params.id, user.id);
 
-    const project = db
-      .prepare('SELECT name FROM projects WHERE id = ?')
-      .get(estimate.project_id) as { name: string } | undefined;
+    const project = db.prepare('SELECT name FROM projects WHERE id = ?').get(estimate.project_id) as
+      { name: string } | undefined;
 
     const files = estimate.job_id
       ? (db
@@ -131,7 +128,9 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
     '/api/estimates/:id/lines/:lineId',
     async (request) => {
       const user = requireUser(request);
-      const body = z.object({ quantity: z.number().finite().positive().max(1_000_000) }).safeParse(request.body);
+      const body = z
+        .object({ quantity: z.number().finite().positive().max(1_000_000) })
+        .safeParse(request.body);
       if (!body.success) throw new AppError('VALIDATION_FAILED', { field: 'quantity' });
 
       const { estimate } = getEstimateForUser(db, request.params.id, user.id);
@@ -172,9 +171,9 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
       })();
 
       const updated = db.prepare('SELECT * FROM estimate_lines WHERE id = ?').get(line.id) as EstimateLineRow;
-      const total = db.prepare('SELECT total_kopecks, price_per_m2_kopecks FROM estimates WHERE id = ?').get(
-        estimate.id,
-      ) as { total_kopecks: number; price_per_m2_kopecks: number | null };
+      const total = db
+        .prepare('SELECT total_kopecks, price_per_m2_kopecks FROM estimates WHERE id = ?')
+        .get(estimate.id) as { total_kopecks: number; price_per_m2_kopecks: number | null };
 
       return {
         line: serializeLine(updated),
@@ -197,7 +196,9 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
     if (!body.success) throw new AppError('VALIDATION_FAILED');
 
     const { estimate } = getEstimateForUser(db, request.params.id, user.id);
-    const item = getPriceItemsByCode(db, estimate.price_list_version_id, [body.data.code]).get(body.data.code);
+    const item = getPriceItemsByCode(db, estimate.price_list_version_id, [body.data.code]).get(
+      body.data.code,
+    );
     if (!item) throw new AppError('PRICE_ITEM_UNKNOWN', { code: body.data.code });
 
     const quantityMilli = toMilliQty(body.data.quantity);
@@ -289,11 +290,12 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
     }
 
     const project = db.prepare('SELECT name FROM projects WHERE id = ?').get(estimate.project_id) as
-      | { name: string }
-      | undefined;
+      { name: string } | undefined;
 
     const files = estimate.job_id
-      ? (db.prepare('SELECT filename FROM job_files WHERE job_id = ? ORDER BY position').all(estimate.job_id) as Array<{
+      ? (db
+          .prepare('SELECT filename FROM job_files WHERE job_id = ? ORDER BY position')
+          .all(estimate.job_id) as Array<{
           filename: string;
         }>)
       : [];
@@ -311,10 +313,7 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
 
     return reply
       .header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      .header(
-        'Content-Disposition',
-        `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
-      )
+      .header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
       .send(buffer);
   });
 }

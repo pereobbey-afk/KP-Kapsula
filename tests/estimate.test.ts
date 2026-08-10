@@ -16,10 +16,31 @@ let db: Db;
 let versionId: string;
 
 const PRICE_ROWS = [
-  { code: 'W-PLASTER', name: 'Штукатурка стен', unit: 'м2', priceKopecks: 45000, section: 'Стены', sectionNo: 1 },
-  { code: 'W-PUTTY', name: 'Шпаклевка стен', unit: 'м2', priceKopecks: 25000, section: 'Стены', sectionNo: 1 },
+  {
+    code: 'W-PLASTER',
+    name: 'Штукатурка стен',
+    unit: 'м2',
+    priceKopecks: 45000,
+    section: 'Стены',
+    sectionNo: 1,
+  },
+  {
+    code: 'W-PUTTY',
+    name: 'Шпаклевка стен',
+    unit: 'м2',
+    priceKopecks: 25000,
+    section: 'Стены',
+    sectionNo: 1,
+  },
   { code: 'W-SCREED', name: 'Стяжка пола', unit: 'м2', priceKopecks: 50000, section: 'Полы', sectionNo: 2 },
-  { code: 'W-SOCKET', name: 'Установка розетки', unit: 'шт', priceKopecks: 35000, section: 'Электрика', sectionNo: 3 },
+  {
+    code: 'W-SOCKET',
+    name: 'Установка розетки',
+    unit: 'шт',
+    priceKopecks: 35000,
+    section: 'Электрика',
+    sectionNo: 3,
+  },
 ];
 
 beforeEach(() => {

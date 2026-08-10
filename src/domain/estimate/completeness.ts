@@ -59,8 +59,7 @@ export const COMPLETENESS_RULES: readonly CompletenessRule[] = [
     id: 'waterproofing',
     title: 'Гидроизоляция мокрых зон',
     keywords: ['гидроизоляц'],
-    appliesWhen: (ctx) =>
-      ctx.hasWetZones === true || matches(ctx, ['санузл', 'ванн', 'душев', 'мокр']),
+    appliesWhen: (ctx) => ctx.hasWetZones === true || matches(ctx, ['санузл', 'ванн', 'душев', 'мокр']),
     severity: 'warning',
     hint: 'Обнаружены мокрые зоны. Гидроизоляция в смете не найдена.',
   },
@@ -111,17 +110,14 @@ export const COMPLETENESS_RULES: readonly CompletenessRule[] = [
     title: 'Демонтажные работы',
     keywords: ['демонтаж', 'разборк', 'снят'],
     // Для бетона демонтаж не нужен — правило применимо только к White Box и вторичке.
-    appliesWhen: (ctx) =>
-      ctx.initialState === 'secondary' || ctx.initialState === 'white_box',
+    appliesWhen: (ctx) => ctx.initialState === 'secondary' || ctx.initialState === 'white_box',
     severity: 'warning',
     hint: 'Исходное состояние предполагает демонтаж, но он не найден в смете.',
   },
 ];
 
 function matches(ctx: CompletenessContext, keywords: readonly string[]): boolean {
-  const haystack = ctx.estimate.lines
-    .map((l) => normalizeText(`${l.name} ${l.section}`))
-    .join(' \n ');
+  const haystack = ctx.estimate.lines.map((l) => normalizeText(`${l.name} ${l.section}`)).join(' \n ');
   return keywords.some((k) => haystack.includes(normalizeText(k)));
 }
 

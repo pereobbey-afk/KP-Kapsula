@@ -89,40 +89,36 @@ export async function registerPriceListRoutes(app: FastifyInstance): Promise<voi
    * CLI `npm run pricelist:import`, чтобы формат исходного файла
    * не влиял на серверный контракт.
    */
-  app.post(
-    '/api/pricelist/import',
-    { bodyLimit: 32 * 1024 * 1024 },
-    async (request) => {
-      const admin = requireAdmin(request);
-      const body = importSchema.safeParse(request.body);
-      if (!body.success) {
-        throw new AppError('VALIDATION_FAILED', {
-          issues: body.error.issues.slice(0, 10).map((i) => `${i.path.join('.')}: ${i.message}`),
-        });
-      }
-
-      const result = importPriceList(db, {
-        label: body.data.label,
-        effectiveDate: body.data.effectiveDate ?? null,
-        sourceNote: body.data.sourceNote ?? null,
-        editions: body.data.editions,
-        createdBy: admin.id,
-        activate: body.data.activate ?? false,
+  app.post('/api/pricelist/import', { bodyLimit: 32 * 1024 * 1024 }, async (request) => {
+    const admin = requireAdmin(request);
+    const body = importSchema.safeParse(request.body);
+    if (!body.success) {
+      throw new AppError('VALIDATION_FAILED', {
+        issues: body.error.issues.slice(0, 10).map((i) => `${i.path.join('.')}: ${i.message}`),
       });
+    }
 
-      logger.info('Прайс-лист импортирован', {
-        requestId: request.requestId,
-        versionId: result.versionId,
-        items: result.report.totalItems,
-        sections: result.report.totalSections,
-        overridden: result.report.overridden.length,
-        rejected: result.report.rejected.length,
-        activated: result.activated,
-      });
+    const result = importPriceList(db, {
+      label: body.data.label,
+      effectiveDate: body.data.effectiveDate ?? null,
+      sourceNote: body.data.sourceNote ?? null,
+      editions: body.data.editions,
+      createdBy: admin.id,
+      activate: body.data.activate ?? false,
+    });
 
-      return result;
-    },
-  );
+    logger.info('Прайс-лист импортирован', {
+      requestId: request.requestId,
+      versionId: result.versionId,
+      items: result.report.totalItems,
+      sections: result.report.totalSections,
+      overridden: result.report.overridden.length,
+      rejected: result.report.rejected.length,
+      activated: result.activated,
+    });
+
+    return result;
+  });
 
   app.post<{ Params: { id: string } }>('/api/pricelist/versions/:id/activate', async (request) => {
     requireAdmin(request);

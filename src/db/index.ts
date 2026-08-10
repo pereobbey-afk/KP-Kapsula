@@ -46,9 +46,7 @@ export function migrate(db: Db): { applied: number[] } {
   );
 
   const applied: number[] = [];
-  const record = db.prepare(
-    'INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)',
-  );
+  const record = db.prepare('INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)');
 
   for (const migration of MIGRATIONS) {
     if (known.has(migration.version)) continue;

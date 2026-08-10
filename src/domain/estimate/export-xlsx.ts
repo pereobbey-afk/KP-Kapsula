@@ -72,9 +72,7 @@ function buildEstimateSheet(workbook: ExcelJS.Workbook, input: ExportInput): voi
   ];
 
   const title = sheet.addRow([
-    input.estimate.is_preliminary
-      ? 'ПРЕДВАРИТЕЛЬНАЯ СМЕТА НА РЕМОНТНЫЕ РАБОТЫ'
-      : 'СМЕТА НА РЕМОНТНЫЕ РАБОТЫ',
+    input.estimate.is_preliminary ? 'ПРЕДВАРИТЕЛЬНАЯ СМЕТА НА РЕМОНТНЫЕ РАБОТЫ' : 'СМЕТА НА РЕМОНТНЫЕ РАБОТЫ',
   ]);
   title.font = { bold: true, size: 14 };
   sheet.mergeCells(title.number, 1, title.number, 10);
@@ -166,9 +164,7 @@ function buildEstimateSheet(workbook: ExcelJS.Workbook, input: ExportInput): voi
   const totalRow = sheet.addRow(['', '', '', 'ИТОГО работ', '', '', '', null]);
   totalRow.font = { bold: true };
   totalRow.getCell(8).value =
-    amountRowNumbers.length > 0
-      ? { formula: `SUM(H${amountRowNumbers[0]}:H${amountRowNumbers.at(-1)})` }
-      : 0;
+    amountRowNumbers.length > 0 ? { formula: `SUM(H${amountRowNumbers[0]}:H${amountRowNumbers.at(-1)})` } : 0;
   totalRow.getCell(8).numFmt = MONEY_FORMAT;
   totalRow.eachCell((cell) => {
     cell.border = thinBorder();
