@@ -86,3 +86,34 @@ export function seedPriceList(
 
   return { versionId, itemIds };
 }
+
+/**
+ * Генерирует синтаксически корректный PDF ровно заданного размера.
+ *
+ * Нужен для проверки, что PDF около 2,23 МБ проходит загрузку без
+ * ложной ошибки размера. Добивка — одна длинная строка-комментарий:
+ * комментарий в PDF тянется до конца строки, поэтому структура цела.
+ */
+export function makeTestPdf(targetBytes: number): Buffer {
+  const header =
+    [
+      '%PDF-1.7',
+      '1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj',
+      '2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj',
+      '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]>>endobj',
+      'trailer<</Root 1 0 R/Size 4>>',
+    ].join('\n') + '\n';
+  const footer = '%%EOF\n';
+
+  const padBytes = targetBytes - header.length - footer.length;
+  if (padBytes < 2) throw new Error('Слишком маленький целевой размер PDF');
+
+  // '%' + наполнитель + '\n' — ровно padBytes байт.
+  const padding = `%${'K'.repeat(padBytes - 2)}\n`;
+  const buffer = Buffer.from(header + padding + footer, 'latin1');
+
+  if (buffer.length !== targetBytes) {
+    throw new Error(`Ожидался размер ${targetBytes}, получен ${buffer.length}`);
+  }
+  return buffer;
+}
