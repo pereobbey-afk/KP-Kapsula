@@ -141,12 +141,7 @@ export function App(): JSX.Element {
       <main className="app-main">
         {error && <ErrorBanner error={error} onDismiss={() => setError(null)} />}
 
-        {screen.name === 'new' && (
-          <NewCalculationView
-            onStarted={handleJobStarted}
-            onPreliminary={(estimateId) => setScreen({ name: 'estimate', estimateId })}
-          />
-        )}
+        {screen.name === 'new' && <NewCalculationView onStarted={handleJobStarted} />}
 
         {screen.name === 'progress' && (
           <ProgressView

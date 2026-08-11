@@ -16,10 +16,7 @@ import type { JSX } from 'react';
  * параметров. Главный источник объёмов — загруженная документация.
  */
 
-type Props = {
-  onStarted: (job: Job) => void;
-  onPreliminary: (estimateId: string) => void;
-};
+type Props = { onStarted: (job: Job) => void };
 
 const INITIAL_STATES = [
   { value: 'concrete', label: 'Бетон', hint: 'Черновое состояние, демонтаж не требуется' },
@@ -27,7 +24,7 @@ const INITIAL_STATES = [
   { value: 'secondary', label: 'Вторичка', hint: 'Вероятен демонтаж существующей отделки' },
 ] as const;
 
-export function NewCalculationView({ onStarted, onPreliminary }: Props): JSX.Element {
+export function NewCalculationView({ onStarted }: Props): JSX.Element {
   const [name, setName] = useState('');
   const [areaM2, setAreaM2] = useState('');
   const [rooms, setRooms] = useState('');
@@ -106,44 +103,6 @@ export function NewCalculationView({ onStarted, onPreliminary }: Props): JSX.Ele
 
       clearIdempotencyKey(seed);
       onStarted(job);
-    } catch (e) {
-      setError(e instanceof ApiError ? e : null);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  /**
-   * Расчёт без документации: объёмы выводятся из площади и числа комнат
-   * по формулам. Документы не нужны, ИИ не участвует, ответ мгновенный.
-   */
-  const submitPreliminary = async (): Promise<void> => {
-    const area = Number(areaM2.replace(',', '.'));
-    if (!Number.isFinite(area) || area <= 0) {
-      setError(
-        new ApiError(
-          {
-            code: 'VALIDATION_FAILED',
-            message: 'Для расчёта без документации укажите площадь объекта.',
-            retryable: false,
-          },
-          400,
-        ),
-      );
-      return;
-    }
-
-    setBusy(true);
-    setError(null);
-    try {
-      const result = await api.preliminary({
-        name: name.trim() || 'Объект без названия',
-        areaM2: area,
-        rooms: rooms ? Number(rooms) : 2,
-        initialState,
-        scopeLevel: scopeLevel.trim() || null,
-      });
-      onPreliminary(result.estimateId);
     } catch (e) {
       setError(e instanceof ApiError ? e : null);
     } finally {
@@ -300,19 +259,6 @@ export function NewCalculationView({ onStarted, onPreliminary }: Props): JSX.Ele
       <p className="form-note">
         Объёмы берутся из документации. Вручную вводить технические параметры не нужно.
       </p>
-
-      <div className="alt-action">
-        <div className="alt-action__text">
-          <strong>Нет документации под рукой?</strong>
-          <span>
-            Посчитаем предварительно по площади и числу комнат: объёмы выводятся по формулам, каждая видна в
-            смете. Это ориентир для разговора с заказчиком, а не договорная смета.
-          </span>
-        </div>
-        <button type="button" className="button" disabled={busy} onClick={() => void submitPreliminary()}>
-          Рассчитать без документации
-        </button>
-      </div>
     </form>
   );
 }

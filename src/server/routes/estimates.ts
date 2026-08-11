@@ -12,8 +12,6 @@ import {
 } from '../../domain/estimate/repository.js';
 import { getPriceItemsByCode, verifyAgainstPriceList } from '../../domain/estimate/calculate.js';
 import { buildEstimateWorkbook } from '../../domain/estimate/export-xlsx.js';
-import { calculatePreliminaryEstimate } from '../../domain/estimate/preliminary.js';
-import { DEFAULT_ASSUMPTIONS } from '../../domain/estimate/geometry.js';
 import { saveEstimate } from '../../domain/estimate/repository.js';
 import type { Db } from '../../db/index.js';
 
@@ -82,79 +80,27 @@ export async function registerEstimateRoutes(app: FastifyInstance): Promise<void
   const { db } = app.ctx;
 
   /**
-   * Предварительный расчёт по общим данным объекта, без документации.
+   * Предварительный расчёт по параметрам объекта — ОТКЛЮЧЁН.
    *
-   * Выполняется синхронно: ИИ не участвует, объёмы выводятся из геометрии
-   * по формулам. Результат сохраняется как обычная смета — попадает в
-   * историю и выгружается в Excel, но помечен предварительным.
+   * Коэффициенты вывода объёмов были не из методики «Капсулы», а
+   * придуманы. Контрольный расчёт дал 4509 ₽ за м² поверхности стен и
+   * 21 000 ₽ за м² площади объекта — заведомо неверный порядок величин.
+   *
+   * Неизвестны два факта, полностью определяющие результат:
+   *   1. в чём измеряется «м²» у настенных работ — в площади стен или
+   *      в площади квартиры (в прайсе встречаются обе трактовки);
+   *   2. складываются ли шпаклёвка и финишная шпаклёвка на одну площадь
+   *      или это взаимоисключающие варианты отделки.
+   *
+   * Пока они не установлены по заполненной смете реального объекта,
+   * маршрут отказывает: неверная цифра хуже отсутствия цифры.
+   * Код расчёта сохранён в domain/estimate/geometry.ts и ruleset.ts.
    */
   app.post('/api/estimates/preliminary', async (request) => {
-    const user = requireUser(request);
-    const body = z
-      .object({
-        name: z.string().min(1).max(200),
-        areaM2: z.number().finite().positive().max(100_000),
-        rooms: z.number().int().min(1).max(100),
-        initialState: z.enum(['concrete', 'white_box', 'secondary']),
-        scopeLevel: z.string().max(500).nullable().optional(),
-        wetZones: z.number().int().min(0).max(20).nullable().optional(),
-        windows: z.number().int().min(0).max(100).nullable().optional(),
-        ceilingHeight: z.number().finite().min(2).max(6).nullable().optional(),
-      })
-      .safeParse(request.body);
-    if (!body.success) {
-      throw new AppError('VALIDATION_FAILED', {
-        issues: body.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`),
-      });
-    }
-
-    const input = body.data;
-    const result = calculatePreliminaryEstimate(db, {
-      params: {
-        areaM2: input.areaM2,
-        rooms: input.rooms,
-        initialState: input.initialState,
-        wetZones: input.wetZones ?? null,
-        windows: input.windows ?? null,
-      },
-      ...(input.ceilingHeight
-        ? { assumptions: { ...DEFAULT_ASSUMPTIONS, ceilingHeight: input.ceilingHeight } }
-        : {}),
+    requireUser(request);
+    throw new AppError('VALIDATION_FAILED', {
+      reason: 'Предварительный расчёт отключён до калибровки методики по реальной смете',
     });
-
-    const projectId = newId('prj');
-    const now = Date.now();
-    db.prepare(
-      `INSERT INTO projects (id, user_id, name, area_milli, rooms, initial_state, scope_level, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    ).run(
-      projectId,
-      user.id,
-      input.name,
-      toMilliQty(input.areaM2),
-      input.rooms,
-      input.initialState,
-      input.scopeLevel ?? null,
-      now,
-      now,
-    );
-
-    const estimateId = saveEstimate(db, {
-      projectId,
-      jobId: null,
-      userId: user.id,
-      estimate: result.estimate,
-    });
-
-    return {
-      estimateId,
-      projectId,
-      // Выведенные величины возвращаются вместе со сметой: логика расчёта
-      // должна быть видна, а не спрятана внутри итога.
-      quantities: result.quantities,
-      assumptions: result.assumptions,
-      unresolved: result.unresolved.map((u) => ({ title: u.rule.title, detail: u.detail })),
-    };
   });
 
   app.get<{ Params: { id: string } }>('/api/estimates/:id', async (request) => {
