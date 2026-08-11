@@ -1,4 +1,5 @@
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { AppError } from '../../shared/errors.js';
 
 /**
@@ -47,14 +48,23 @@ export function detectMimeBySignature(buffer: Buffer): string | null {
  * или интерфейсу. Расширение сохраняется.
  */
 export function sanitizeFilename(raw: string): string {
-  const base = path.basename(raw.replace(/\\/g, '/'));
-  const ext = path.extname(base).toLowerCase().slice(0, 10);
+  // Разделители путей заменяются ДО basename: в реальных именах
+  // встречается «№52/2», и basename отбросил бы всё до слэша,
+  // превратив имя в неузнаваемое. Заодно это снимает обход каталогов.
+  const flattened = raw.replace(/[\\/]+/g, '-');
+  const base = path.basename(flattened);
+
+  const rawExt = path.extname(base);
+  // Слишком длинная «точка с хвостом» — это часть имени, а не расширение.
+  // Обрезать её нельзя: длина основы считается от той же величины,
+  // иначе конец имени будет съеден.
+  const ext = rawExt.length > 1 && rawExt.length <= 10 ? rawExt.toLowerCase() : '';
   const stem = base
-    .slice(0, base.length - path.extname(base).length)
-    // Вырезаются управляющие символы (U+0000–U+001F), разделители путей
-    // и спецсимволы оболочки — в имени файла они недопустимы.
+    .slice(0, base.length - ext.length)
+    // Вырезаются управляющие символы (U+0000–U+001F) и спецсимволы
+    // оболочки — в имени файла они недопустимы.
     // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001F<>:"/\\|?*]+/g, ' ')
+    .replace(/[\u0000-\u001F<>:"|?*]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 120);
@@ -138,15 +148,65 @@ export function isEncryptedPdf(buffer: Buffer): boolean {
   return /\/Encrypt\s/.test(head) || /\/Encrypt\s/.test(tail);
 }
 
-/** Грубая, но дешёвая оценка числа страниц PDF — для отчёта об обработке. */
+/**
+ * Оценка числа страниц PDF.
+ *
+ * В PDF 1.5+ объекты часто лежат в сжатых потоках (/ObjStm), поэтому
+ * по сырым байтам счётчик ничего не находит. Поэтому при нулевом
+ * результате потоки распаковываются и просматриваются заново.
+ */
 export function estimatePdfPageCount(buffer: Buffer): number | null {
-  const text = buffer.toString('latin1');
-  const byType = text.match(/\/Type\s*\/Page[^s]/g)?.length ?? 0;
-  if (byType > 0) return byType;
+  // Объекты страниц могут быть раскиданы по нескольким потокам, поэтому
+  // они суммируются. /Count корневого узла дерева страниц даёт общее
+  // число напрямую — берём наибольшее из двух оценок.
+  let pageObjects = countPageObjects(buffer.toString('latin1'));
+  let maxCount = maxPageTreeCount(buffer.toString('latin1'));
 
+  const marker = Buffer.from('stream');
+  const endMarker = Buffer.from('endstream');
+  let from = 0;
+  for (;;) {
+    const index = buffer.indexOf(marker, from);
+    if (index === -1) break;
+
+    // «endstream» тоже содержит «stream»: без этой проверки потоки
+    // распаковывались бы с наложением и страницы считались дважды.
+    if (index >= 3 && buffer.subarray(index - 3, index).toString('latin1') === 'end') {
+      from = index + marker.length;
+      continue;
+    }
+    from = index + marker.length;
+
+    let start = from;
+    if (buffer[start] === 0x0d) start += 1;
+    if (buffer[start] === 0x0a) start += 1;
+
+    const end = buffer.indexOf(endMarker, start);
+    if (end === -1) break;
+    from = end + endMarker.length;
+
+    try {
+      const text = zlib.inflateSync(buffer.subarray(start, end)).toString('latin1');
+      pageObjects += countPageObjects(text);
+      maxCount = Math.max(maxCount, maxPageTreeCount(text));
+    } catch {
+      // Поток не сжат методом Flate или повреждён — пропускаем.
+    }
+  }
+
+  const best = Math.max(pageObjects, maxCount);
+  return best > 0 ? best : null;
+}
+
+/** Число объектов страниц: «/Type /Page», но не «/Pages». */
+function countPageObjects(text: string): number {
+  return text.match(/\/Type\s*\/Page(?![s])/g)?.length ?? 0;
+}
+
+/** Наибольшее значение /Count — в корне дерева страниц это общее число. */
+function maxPageTreeCount(text: string): number {
   const counts = [...text.matchAll(/\/Count\s+(\d+)/g)].map((m) => Number(m[1]));
-  const max = counts.length > 0 ? Math.max(...counts) : 0;
-  return max > 0 ? max : null;
+  return counts.length > 0 ? Math.max(...counts) : 0;
 }
 
 /** Проверка, что PDF не оборван на середине. */

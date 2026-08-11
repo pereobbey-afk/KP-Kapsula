@@ -17,6 +17,10 @@ export type CatalogueEntry = {
   section: string;
   name: string;
   unit: string;
+  /** Поверхность расценки: стены, потолок, пол, откосы. */
+  surface?: string | null;
+  /** Разная цена при одинаковом описании — требует внимания. */
+  ambiguous?: boolean;
 };
 
 export const EXTRACTION_SYSTEM_PROMPT = `Ты — инженер-сметчик компании «Капсула». Ты анализируешь проектную документацию по ремонту и извлекаешь из неё проверяемые факты об объёмах работ.
@@ -67,7 +71,14 @@ export function renderCatalogue(entries: readonly CatalogueEntry[]): string {
 
   const blocks: string[] = [];
   for (const [section, items] of bySection) {
-    const lines = items.map((i) => `${i.code}\t${i.name}\t${i.unit}`).join('\n');
+    const lines = items
+      .map((i) => {
+        const surface = i.surface ? `\t[${i.surface}]` : '';
+        // Неоднозначные позиции помечаются, чтобы выбор не был слепым.
+        const mark = i.ambiguous ? '\t(!)' : '';
+        return `${i.code}\t${i.name}\t${i.unit}${surface}${mark}`;
+      })
+      .join('\n');
     blocks.push(`## ${section}\n${lines}`);
   }
   return blocks.join('\n\n');
@@ -114,7 +125,13 @@ ${renderObjectBrief(brief)}
 
 # Каталог работ активного прайс-листа
 Поле code в ответе обязано быть одним из перечисленных ниже кодов.
-Формат строки: КОД<таб>НАИМЕНОВАНИЕ<таб>ЕДИНИЦА
+Формат строки: КОД<таб>НАИМЕНОВАНИЕ<таб>ЕДИНИЦА[<таб>[ПОВЕРХНОСТЬ]][<таб>(!)]
+
+Поверхность в квадратных скобках различает расценки одной работы для стен,
+потолка, пола и откосов — цены у них разные, выбирай по месту работ.
+Пометка (!) означает, что в прайсе есть несколько позиций с таким же
+описанием, но разной ценой. Если выбираешь такую позицию, обязательно
+поясни основание в поле basis.
 
 ${catalogue}
 

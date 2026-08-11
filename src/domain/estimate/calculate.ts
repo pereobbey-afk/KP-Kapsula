@@ -104,6 +104,9 @@ export type PriceItemRow = {
   name: string;
   unit: string;
   price_kopecks: number;
+  surface: string | null;
+  /** 1, если в прайсе есть позиция с тем же описанием, но другой ценой. */
+  ambiguous: number;
 };
 
 export type ActiveVersion = {
@@ -137,7 +140,8 @@ export function getPriceItemsByCode(
     const placeholders = slice.map(() => '?').join(',');
     const rows = db
       .prepare(
-        `SELECT id, version_id, code, section, section_no, name, unit, price_kopecks
+        `SELECT id, version_id, code, section, section_no, name, unit, price_kopecks,
+                surface, ambiguous
            FROM price_items WHERE version_id = ? AND code IN (${placeholders})`,
       )
       .all(versionId, ...slice) as PriceItemRow[];
@@ -229,6 +233,19 @@ export function calculateEstimate(db: Db, input: CalculateInput): CalculatedEsti
     // Ручная правка не может сохранять статус «подтверждено проектом».
     const confidence: Confidence =
       claim.isManual && claim.confidence === 'confirmed' ? 'assumption' : claim.confidence;
+
+    if (item.ambiguous === 1) {
+      // Молчаливое использование одной из нескольких цен недопустимо:
+      // сотрудник обязан увидеть, что расценка требует проверки.
+      notes.push({
+        kind: 'clarification',
+        severity: 'warning',
+        title: `Требует проверки цена: ${item.name}`,
+        detail:
+          'В прайс-листе есть несколько позиций с таким же описанием и единицей, ' +
+          'но с разной ценой. Проверьте, что выбрана верная расценка.',
+      });
+    }
 
     lines.push({
       position: lines.length + 1,

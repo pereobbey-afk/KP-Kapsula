@@ -60,8 +60,9 @@ export function importPriceList(db: Db, input: ImportPriceListInput): ImportPric
 
     const insert = db.prepare(
       `INSERT INTO price_items
-         (id, version_id, code, section_no, section, name, unit, price_kopecks, source_edition, source_row, match_key, search_text)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (id, version_id, code, section_no, section, surface, variant, ambiguous,
+          name, unit, price_kopecks, source_edition, source_row, match_key, search_text)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
 
     for (const item of items) {
@@ -71,6 +72,9 @@ export function importPriceList(db: Db, input: ImportPriceListInput): ImportPric
         item.code,
         item.sectionNo,
         item.section,
+        item.surface,
+        item.variant,
+        item.ambiguous ? 1 : 0,
         item.name,
         item.unit,
         item.priceKopecks,

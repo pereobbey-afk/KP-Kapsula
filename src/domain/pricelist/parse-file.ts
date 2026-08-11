@@ -15,6 +15,8 @@ import type { RawPriceRow } from './import.js';
 export type ColumnMap = {
   code?: number;
   section?: number;
+  /** Колонка «тип»: отделяет работы от материалов. */
+  type?: number;
   name: number;
   unit: number;
   price: number;
@@ -23,9 +25,12 @@ export type ColumnMap = {
 const HEADER_PATTERNS: Record<keyof ColumnMap, RegExp[]> = {
   code: [/^код/, /^артикул/, /^шифр/, /^id$/, /^№\s*поз/],
   section: [/раздел/, /^группа/, /^категор/, /^блок/],
-  name: [/наименование/, /^работ/, /^описание/, /^вид\s*работ/, /^название/],
+  type: [/^тип$/, /^вид$/],
+  // «позиция» — так названа работа в сметных приложениях «Капсулы».
+  name: [/наименование/, /^позиц/, /^работ/, /^описание/, /^вид\s*работ/, /^название/],
   unit: [/^ед/, /единиц/, /^изм/],
-  price: [/цена/, /стоимость/, /^тариф/, /расценк/, /^руб/],
+  // «объём» намеренно не считается ценой: в шаблоне сметы это соседняя колонка.
+  price: [/^стоимость/, /цена/, /^тариф/, /расценк/, /^руб/],
 };
 
 export type SheetParseResult = {
@@ -68,6 +73,7 @@ export function detectColumns(
           price: found.price,
           ...(found.code !== undefined ? { code: found.code } : {}),
           ...(found.section !== undefined ? { section: found.section } : {}),
+          ...(found.type !== undefined ? { type: found.type } : {}),
         },
         headerRow: r,
         headers: cells.filter(Boolean),
@@ -96,6 +102,7 @@ function toRawRows(
     const price = pick(map.price);
     const section = pick(map.section);
     const code = pick(map.code);
+    const type = pick(map.type);
 
     // Полностью пустая строка пропускается без записи в отчёт.
     if (!name && !unit && !price && !section && !code) continue;
@@ -106,6 +113,7 @@ function toRawRows(
       price,
       section,
       code,
+      type,
       sourceRow: `${sheetName}!строка ${r + 1}`,
     });
   }

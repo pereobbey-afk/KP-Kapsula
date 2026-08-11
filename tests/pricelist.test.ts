@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { mergeEditions, formatImportSummary, type PriceEdition } from '../src/domain/pricelist/import.js';
+import {
+  mergeEditions,
+  formatImportSummary,
+  detectSurface,
+  type PriceEdition,
+} from '../src/domain/pricelist/import.js';
 import {
   matchKey,
   normalizeUnit,
@@ -156,20 +161,120 @@ describe('строки, не ставшие позициями, не исчез�
     expect(report.rejected[0]!.reason).toBe('section_header');
   });
 
-  it('дубль внутри одной редакции фиксируется в отчёте', () => {
+  it('полностью совпадающая строка отбрасывается как дубль', () => {
     const edition: PriceEdition = {
       label: 'test',
       effectiveDate: '2026-01-01',
       rows: [
         { section: '1', name: 'Штукатурка стен', unit: 'м2', price: '400' },
-        { section: '1', name: 'ШТУКАТУРКА  СТЕН', unit: 'кв.м', price: '999' },
+        { section: '1', name: 'ШТУКАТУРКА  СТЕН', unit: 'кв.м', price: '400' },
       ],
     };
     const { items, report } = mergeEditions([edition]);
 
     expect(items).toHaveLength(1);
-    // Осталась первая встреченная строка, а не последняя.
     expect(items[0]!.priceKopecks).toBe(40000);
     expect(report.duplicatesWithinEdition).toHaveLength(1);
+    expect(report.ambiguousPositions).toHaveLength(0);
+  });
+
+  it('одинаковое описание с РАЗНОЙ ценой сохраняет обе расценки', () => {
+    // Молчаливый выбор одной из цен потерял бы расценку,
+    // поэтому сохраняются обе, а факт попадает в отчёт.
+    const edition: PriceEdition = {
+      label: 'test',
+      effectiveDate: '2026-01-01',
+      rows: [
+        { section: '1', name: 'Монтаж угла в нише', unit: 'шт', price: '4000' },
+        { section: '1', name: 'Монтаж угла в нише', unit: 'шт', price: '2000' },
+      ],
+    };
+    const { items, report } = mergeEditions([edition]);
+
+    expect(items).toHaveLength(2);
+    expect(items.map((i) => i.priceKopecks).sort((a, b) => a - b)).toEqual([200000, 400000]);
+    // Обе помечены как требующие проверки, коды у них разные.
+    expect(items.every((i) => i.ambiguous)).toBe(true);
+    expect(new Set(items.map((i) => i.code)).size).toBe(2);
+    expect(report.ambiguousPositions).toHaveLength(1);
+    expect(report.ambiguousPositions[0]!.prices.sort((a, b) => a - b)).toEqual([200000, 400000]);
+  });
+});
+
+describe('структура настоящего прайса «Капсулы»', () => {
+  it('материалы не попадают в прайс работ', () => {
+    // Задание запрещает включать материалы в расчёт, поэтому они
+    // не попадают даже в каталог — модель не должна их видеть.
+    const edition: PriceEdition = {
+      label: 'test',
+      effectiveDate: '2026-01-01',
+      rows: [
+        { type: 'работа', section: '1', name: 'Укладка плитки', unit: 'м2', price: '1200' },
+        { type: 'мат', section: '1', name: 'Плиточный клей', unit: 'кг', price: '90' },
+        { type: 'материалы', section: '1', name: 'Грунтовка', unit: 'л', price: '450' },
+      ],
+    };
+    const { items, report } = mergeEditions([edition]);
+
+    expect(items).toHaveLength(1);
+    expect(items[0]!.name).toBe('Укладка плитки');
+    expect(report.materialsExcluded).toBe(2);
+  });
+
+  it('маркеры этапов и итогов не становятся разделами', () => {
+    const edition: PriceEdition = {
+      label: 'test',
+      effectiveDate: '2026-01-01',
+      rows: [
+        { name: 'Демонтажные работы / Стены', unit: null, price: null },
+        { type: 'работа', name: 'Демонтаж перегородки', unit: 'м2', price: '500' },
+        { name: 'Второй этап:', unit: null, price: null },
+        { name: 'Итого за второй этап:', unit: null, price: null },
+        { name: 'Монтажные работы / Стяжка пола', unit: null, price: null },
+        { type: 'работа', name: 'Стяжка пола', unit: 'м2', price: '700' },
+      ],
+    };
+    const { items, report } = mergeEditions([edition]);
+
+    expect(items).toHaveLength(2);
+    // Работа после маркеров попала в свой раздел, а не во «Второй этап:».
+    expect(items.map((i) => i.section)).toEqual(
+      expect.arrayContaining(['Демонтажные работы / Стены', 'Монтажные работы / Стяжка пола']),
+    );
+    expect(items.some((i) => i.section.includes('этап'))).toBe(false);
+    expect(report.rejected.filter((r) => r.reason === 'stage_marker')).toHaveLength(2);
+  });
+
+  it('поверхность различает одинаковые работы с разной ценой', () => {
+    // В прайсе один раздел содержит блоки по поверхностям без заголовков:
+    // общие работы повторяются, а потолок дешевле стен.
+    const edition: PriceEdition = {
+      label: 'test',
+      effectiveDate: '2026-01-01',
+      rows: [
+        { name: 'Предчистовая отделка', unit: null, price: null },
+        { type: 'работа', name: 'Обеспыливание', unit: 'м2', price: '160' },
+        { type: 'работа', name: 'Шпаклевка стен / до 2-ух слоев', unit: 'м2', price: '1080' },
+        { type: 'работа', name: 'Обеспыливание', unit: 'м2', price: '135' },
+        { type: 'работа', name: 'Шпаклевка потолка / до 2-ух слоев', unit: 'м2', price: '1080' },
+      ],
+    };
+    const { items } = mergeEditions([edition]);
+
+    const dedusting = items.filter((i) => i.name === 'Обеспыливание');
+    expect(dedusting).toHaveLength(2);
+    expect(dedusting.find((i) => i.surface === 'стены')?.priceKopecks).toBe(16000);
+    expect(dedusting.find((i) => i.surface === 'потолок')?.priceKopecks).toBe(13500);
+    // Это не неоднозначность: поверхность их однозначно различает.
+    expect(dedusting.every((i) => !i.ambiguous)).toBe(true);
+  });
+
+  it('определение поверхности работает на кириллице', () => {
+    // \\b и \\w в JavaScript не работают с кириллицей — регрессия на эту ловушку.
+    expect(detectSurface('Шпаклевка стен / до 2-ух слоев')).toBe('стены');
+    expect(detectSurface('Финишная шпаклевка потолка')).toBe('потолок');
+    expect(detectSurface('Устройство откосов оконных')).toBe('откосы');
+    expect(detectSurface('Монтаж напольного плинтуса')).toBe('пол');
+    expect(detectSurface('Обеспыливание')).toBeNull();
   });
 });

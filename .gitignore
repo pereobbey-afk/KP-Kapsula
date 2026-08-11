@@ -19,3 +19,6 @@ storage/
 coverage/
 tests/fixtures/private/
 .vitest/
+prices/
+проект.pdf
+*.pdf

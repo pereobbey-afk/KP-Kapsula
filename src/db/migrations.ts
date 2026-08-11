@@ -276,4 +276,25 @@ CREATE TABLE project_history (
 CREATE INDEX idx_history_project ON project_history(project_id, id DESC);
 `,
   },
+  {
+    version: 2,
+    name: 'price_item_surface',
+    sql: `
+-- Поверхность расценки: стены, потолок, пол, откосы.
+--
+-- В прайсе один раздел содержит блоки по поверхностям без заголовков,
+-- и одна и та же работа имеет разную цену для стен и для потолка.
+-- Без этого признака такие расценки схлопывались бы в одну.
+ALTER TABLE price_items ADD COLUMN surface TEXT;
+CREATE INDEX idx_price_items_surface ON price_items(version_id, surface);
+
+-- Номер варианта и признак неоднозначности.
+--
+-- В исходном файле встречаются позиции с одинаковым описанием, но разной
+-- ценой. Обе сохраняются: молчаливый выбор одной потерял бы расценку.
+-- Строка сметы, использующая такую позицию, помечается уточнением.
+ALTER TABLE price_items ADD COLUMN variant INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE price_items ADD COLUMN ambiguous INTEGER NOT NULL DEFAULT 0;
+`,
+  },
 ];

@@ -98,9 +98,17 @@ export async function processJob(ctx: PipelineContext, job: JobRow): Promise<voi
     const version = getActivePriceListVersion(ctx.db);
     const catalogue = ctx.db
       .prepare(
-        'SELECT code, section, name, unit FROM price_items WHERE version_id = ? ORDER BY section_no, name',
+        `SELECT code, section, name, unit, surface, ambiguous
+           FROM price_items WHERE version_id = ? ORDER BY section_no, section, name`,
       )
-      .all(version.id) as Array<{ code: string; section: string; name: string; unit: string }>;
+      .all(version.id) as Array<{
+      code: string;
+      section: string;
+      name: string;
+      unit: string;
+      surface: string | null;
+      ambiguous: number;
+    }>;
 
     if (catalogue.length === 0) throw new AppError('PRICE_LIST_MISSING');
 
@@ -124,7 +132,7 @@ export async function processJob(ctx: PipelineContext, job: JobRow): Promise<voi
         initialState: project.initial_state,
         scopeLevel: project.scope_level,
       },
-      catalogue,
+      catalogue: catalogue.map((c) => ({ ...c, ambiguous: c.ambiguous === 1 })),
       documents,
       signal: controller.signal,
     });
