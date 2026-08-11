@@ -175,20 +175,35 @@ export function detectSurface(name: string): string | null {
  * в пределах того же блока. Смотрим вперёд, потому что в исходном файле
  * якорь стоит после общих работ блока.
  */
+const SURFACE_LOOKAHEAD_ROWS = 8;
+
 function surfaceByLookahead(rows: readonly RawPriceRow[]): Array<string | null> {
   const result: Array<string | null> = new Array(rows.length).fill(null);
   let current: string | null = null;
+  let distance = 0;
 
   for (let i = rows.length - 1; i >= 0; i -= 1) {
     const row = rows[i]!;
     const name = (row.name ?? '').trim();
+
     // Заголовок раздела обрывает блок: за него поверхность не переносится.
     if (name && !(row.unit ?? '').trim()) {
       current = null;
+      distance = 0;
       continue;
     }
+
     const own = detectSurface(name);
-    if (own) current = own;
+    if (own) {
+      current = own;
+      distance = 0;
+    } else {
+      distance += 1;
+      // Блок работ по одной поверхности идёт подряд и короток. Без этого
+      // ограничения поверхность далёкого якоря расползалась бы на строки,
+      // не имеющие к ней отношения («Вынос мусора» получал бы «потолок»).
+      if (distance > SURFACE_LOOKAHEAD_ROWS) current = null;
+    }
     result[i] = current;
   }
   return result;

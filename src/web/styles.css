@@ -490,6 +490,30 @@ textarea {
   color: var(--text-muted);
 }
 
+.alt-action {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: #fafbff;
+}
+
+.alt-action__text {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.alt-action__text span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 /* ---------- Прогресс ---------- */
 
 .progress-caption {

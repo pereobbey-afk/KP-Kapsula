@@ -157,6 +157,16 @@ export type EstimateResponse = {
   notes: EstimateNote[];
 };
 
+/** Величина, выведенная из геометрии, вместе с формулой. */
+export type DerivedQuantity = {
+  id: string;
+  title: string;
+  value: number;
+  unit: string;
+  formula: string;
+  confidence: 'derived' | 'assumption';
+};
+
 export type ProjectSummary = {
   id: string;
   name: string;
@@ -274,6 +284,24 @@ export const api = {
     ),
 
   projects: () => request<{ projects: ProjectSummary[] }>('/api/projects'),
+
+  /** Предварительный расчёт по общим данным объекта, без документации. */
+  preliminary: (payload: {
+    name: string;
+    areaM2: number;
+    rooms: number;
+    initialState: string;
+    scopeLevel: string | null;
+    wetZones?: number | null;
+    windows?: number | null;
+    ceilingHeight?: number | null;
+  }) =>
+    request<{
+      estimateId: string;
+      projectId: string;
+      quantities: DerivedQuantity[];
+      unresolved: Array<{ title: string; detail: string }>;
+    }>('/api/estimates/preliminary', json(payload)),
 
   priceItems: (query: string) =>
     request<{ items: PriceItem[] }>(`/api/pricelist/items?q=${encodeURIComponent(query)}&limit=40`),
