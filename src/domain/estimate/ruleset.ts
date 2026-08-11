@@ -43,9 +43,6 @@ export type WorkRule = {
   reason?: string;
 };
 
-const needsDemolition = (ctx: RuleContext): boolean =>
-  ctx.initialState === 'secondary' || ctx.initialState === 'white_box';
-
 /**
  * Состав предварительной сметы.
  *
