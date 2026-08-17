@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>A-Frame Starter Scene</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+    <script>
+      // Custom component: spin an entity, and reverse direction on click.
+      AFRAME.registerComponent('spin', {
+        schema: {
+          speed: { type: 'number', default: 30 } // degrees / second
+        },
+        init: function () {
+          this.el.addEventListener('click', () => { this.data.speed *= -1; });
+        },
+        tick: function (time, timeDelta) {
+          this.el.object3D.rotation.y += THREE.MathUtils.degToRad(
+            this.data.speed * timeDelta / 1000
+          );
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene shadow="type: pcfsoft">
+      <a-assets>
+        <!-- Swap this for your own equirectangular sky image if you have one. -->
+      </a-assets>
+
+      <!-- Sky and ground -->
+      <a-sky color="#ECECEC"></a-sky>
+      <a-plane position="0 0 0" rotation="-90 0 0" width="30" height="30"
+               color="#7BC8A4" shadow="receive: true"></a-plane>
+
+      <!-- Lighting: a hemisphere fill + a directional key that casts shadows -->
+      <a-light type="hemisphere" color="#FFF" groundColor="#7BC8A4" intensity="0.6"></a-light>
+      <a-light type="directional" color="#FFF" intensity="0.8"
+               position="-2 4 2" castShadow="true"></a-light>
+
+      <!-- Interactive, animated content in front of the camera -->
+      <a-box class="clickable" spin="speed: 45" position="-1.2 1.5 -3" depth="1" height="1" width="1"
+             color="#4CC3D9" shadow="cast: true"
+             animation__enter="property: material.color; type: color; to: #FFC65D; startEvents: mouseenter; dur: 200"
+             animation__leave="property: material.color; type: color; to: #4CC3D9; startEvents: mouseleave; dur: 200"></a-box>
+
+      <a-sphere class="clickable" position="1 1.25 -4" radius="1.25" color="#EF2D5E"
+                shadow="cast: true"
+                animation="property: position; to: 1 2 -4; dir: alternate; loop: true; dur: 1500; easing: easeInOutQuad">
+      </a-sphere>
+
+      <a-text value="Click the cube to reverse its spin"
+              position="0 0.4 -2.5" align="center" width="4" color="#222"></a-text>
+
+      <!-- Camera rig at standing eye height, with a gaze/mouse cursor -->
+      <a-entity id="rig" position="0 1.6 0">
+        <a-entity camera look-controls wasd-controls>
+          <a-cursor raycaster="objects: .clickable"></a-cursor>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
